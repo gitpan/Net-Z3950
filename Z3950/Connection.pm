@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.21 2003/09/16 13:28:14 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.24 2003/11/21 12:05:47 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -73,10 +73,10 @@ specified address); alternatively, it may be set to the distinguished
 value -1 if the TCP/IP connection was correctly forged, but the Z39.50
 C<Init> failed.
 
-Any of the standard options (including synchronous or asynchronous
+Any of the standard options (including asynchronous
 mode) may be specified as additional arguments.  Specifically:
 
-	$conn = new Net::Z3950::Connection($mgr, $host, $port, mode => 'async');
+	$conn = new Net::Z3950::Connection($mgr, $host, $port, async => 1);
 
 Works as expected.
 
@@ -152,14 +152,23 @@ sub new {
 				       cb => \&Net::Z3950::ResultSet::_idle)
 	or die "can't make idle-watcher on socket to $addr";
 
-    # Generate the INIT request and queue it up for subsequent dispatch
+    # Generate the INIT request and queue it up for subsequent
+    # dispatch.  The standard option names for password and group-ID
+    # (used in authentication) are "pass" and "group" (see v1.4 of the
+    # ZOOM AAPI), but pre-0.39 versions of Net::Z3950 used "password"
+    # and "groupid", so we continue to support use old option names as
+    # fallbacks in order to support old applications.
     my $errmsg = '';
+    my $pass = $this->option('pass');
+    $pass = $this->option('password') if !defined $pass;
+    my $group = $this->option('group');
+    $group = $this->option('groupid') if !defined $group;
     my $ir = Net::Z3950::makeInitRequest('init',
 				    $this->option('preferredMessageSize'),
 				    $this->option('maximumRecordSize'),
 				    $this->option('user'),
-				    $this->option('password'),
-				    $this->option('groupid'),
+				    $pass,
+				    $group,
 				    $this->option('implementationId'),
 				    $this->option('implementationName'),
 				    $this->option('implementationVersion'),
@@ -170,7 +179,7 @@ sub new {
     $this->{refId2cb}->{'init'} = $cb if defined $cb;
     $mgr->_register($this);
 
-    if ($this->option('mode') ne 'async') {
+    if (!$this->option('async')) {
 	$this->expect(Net::Z3950::Op::Init, "init")
 	    or return undef;	# e.g. ECONNREFUSED
 
@@ -527,7 +536,7 @@ sub startSearch {
 				      $this->option('databaseName'),
 				      $this->option('smallSetElementSetName'),
 				      $this->option('mediumSetElementSetName'),
-				      $this->option('preferredRecordSyntax'),
+				      $this->preferredRecordSyntax(),
 				      $queryType, $value, $errmsg);
     die "can't make search request: $errmsg" if !defined $sr;
     $rss->[$nrss] = 0;		# placeholder
@@ -538,6 +547,24 @@ sub startSearch {
     my $cb = shift();
     #warn "startSearch: cb='$cb'";
     $this->{refId2cb}->{$nrss} = $cb if defined $cb;
+}
+
+
+# Decode record-syntax strings into enumerators
+sub preferredRecordSyntax {
+    my $this = shift();
+
+    my $str = $this->option("preferredRecordSyntax");
+    return $str
+	if $str =~ /^\d+$/;
+
+    $str =~ s/-//;
+    $str = uc($str);
+    my $val = $Net::Z3950::RecordSyntax::map{$str};
+    die "unrecognised record-syntax name '$str'"
+	if !defined $val;
+
+    return $val;
 }
 
 
@@ -684,6 +711,10 @@ C<errcode()> method, any additional information via the C<addinfo()>
 method, and the operation that was being attempted when the error
 occurred via the C<errop()> method.  (The error operation returned
 takes one of the values that may be returned from the C<op()> method.)
+
+The meanings of the BIB-1 diagnostics are described at on the Z39.50
+Maintenance Agency web-site at
+http://lcweb.loc.gov/z3950/agency/defns/bib1diag.html
 
 As a convenience, C<$conn->errmsg()> is equivalent to
 C<Net::Z3950::errstr($conn->errcode())>.

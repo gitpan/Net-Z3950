@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.13 2003/10/24 12:29:05 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.15 2003/11/21 12:05:47 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -151,7 +151,7 @@ sub present {
     }
     $this->{conn}->{idleWatcher}->start() if $seen_new;
 
-    if ($this->option('mode') eq 'async') {
+    if ($this->option('async')) {
 	$this->{errcode} = 0;
 	return 1;
     }
@@ -204,7 +204,7 @@ sub record {
 	$this->present($which, $this->option('prefetch') || 1)
 	    or return undef;
 
-	if ($this->option('mode') eq 'async') {
+	if ($this->option('async')) {
 	    $this->{errcode} = 0;
 	    return undef;
 	}
@@ -310,7 +310,7 @@ sub _send_presentRequest {
 					$this->{rsName} : 'default',
 				       $first, $howmany,
 				       $this->option('elementSetName'),
-				       $this->option('preferredRecordSyntax'),
+				       $this->preferredRecordSyntax(),
 				       $errmsg);
     die "can't make present request: $errmsg" if !defined $pr;
     $this->{conn}->_enqueue($pr);
@@ -449,8 +449,7 @@ sub _tweak {
     # the benefit of those misbegotten monstrosities, we wrap such
     # unwanted USMARC records in an otherwise empty OPAC-record
     # structure.  <sigh>
-    if ($this->option('preferredRecordSyntax') ==
-	Net::Z3950::RecordSyntax::OPAC &&
+    if ($this->preferredRecordSyntax() == Net::Z3950::RecordSyntax::OPAC &&
 	$rec->isa("Net::Z3950::Record::USMARC")) {
 	return bless {
 	    bibliographicRecord => $rec,
@@ -460,6 +459,12 @@ sub _tweak {
     }
 
     return $rec;
+}
+
+
+# The code is the as for the Connection class's same-named method
+sub preferredRecordSyntax {
+    return Net::Z3950::Connection::preferredRecordSyntax(@_);
 }
 
 

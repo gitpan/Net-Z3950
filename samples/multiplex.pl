@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/multiplex.pl,v 1.3 2001/10/18 12:30:07 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/multiplex.pl,v 1.4 2003/11/17 14:29:35 mike Exp $
 
 use Net::Z3950;
 use strict;
@@ -11,7 +11,7 @@ my @servers = (['localhost', 9999],
 my @searches = ('computer', 'data', 'survey');
 my %conn2si;
 
-my $mgr = new Net::Z3950::Manager(mode => 'async');
+my $mgr = new Net::Z3950::Manager(async => 1);
 my @conn;
 foreach my $spec (@servers) {
     my($host, $port, $search) = @$spec;

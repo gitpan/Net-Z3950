@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.4 2002/10/21 18:27:00 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.6 2003/11/21 12:05:47 mike Exp $
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -53,11 +53,11 @@ if (Net::Z3950::diagbib1_str(1) eq 'Permanent system error' &&
 }
 
 # Create Net::Z3950 manager
-my $mgr = new Net::Z3950::Manager(mode => 'async',
+my $mgr = new Net::Z3950::Manager(async => 1,
 	smallSetUpperBound => 0, largeSetLowerBound => 10000,
 	mediumSetPresentNumber => 5,
-	preferredRecordSyntax => Net::Z3950::RecordSyntax::GRS1
-#	preferredRecordSyntax => Net::Z3950::RecordSyntax::USMARC
+	preferredRecordSyntax => "GRS-1"
+#	preferredRecordSyntax => "USMARC"
 			     )
     or (print "not ok 4\n"), exit;
 print "ok 4\n";

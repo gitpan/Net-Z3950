@@ -1,7 +1,13 @@
-# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.6 2003/05/09 10:33:23 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.10 2003/12/19 16:01:03 mike Exp $
 
-my $yazinc = `yaz-config --cflags`;
-my $yazlibs = `yaz-config --libs`;
+# If you want to build this module against a YAZ build that's not been
+# installed in one of the usual places, just give a full path to where
+# your YAZ build's yaz-config script is in the line below.  For example:
+#	my $yazconf = "/home/me/stuff/yaz-2.0.4/yaz-config";
+
+my $yazconf = "yaz-config";
+my $yazinc = `$yazconf --cflags`;
+my $yazlibs = `$yazconf --libs`;
 if (!$yazinc || !$yazlibs) {
     die "ERROR: Unable to call script 'yaz-config': is YAZ installed?";
 }
@@ -34,7 +40,7 @@ WriteMakefile(
 #
 sub MY::postamble {
     '$(MYEXTLIB): yazwrap/Makefile
-	cd yazwrap && $(MAKE) $(PASTHRU)';
+	cd yazwrap && $(MAKE) INC=$(PASTHRU_INC) $(PASTHRU)';
 }
 
 sub MY::post_constants {

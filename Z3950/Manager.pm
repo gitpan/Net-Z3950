@@ -1,4 +1,4 @@
-# $Id: Manager.pm,v 1.13 2003/09/12 22:04:20 mike Exp $
+# $Id: Manager.pm,v 1.17 2003/12/19 16:08:32 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -11,7 +11,7 @@ Net::Z3950::Manager - State manager for multiple Z39.50 connections.
 
 =head1 SYNOPSIS
 
-	$mgr = new Net::Z3950::Manager(mode => 'async');
+	$mgr = new Net::Z3950::Manager(async => 1);
 	$conn = $mgr->connect($hostname, $port);
 	# Set up some more connections, then:
 	while ($conn = $mgr->wait()) {
@@ -64,12 +64,11 @@ options are recognised:
 
 =over 4
 
-=item mode
+=item async
 
-Must be either C<sync> or C<async>; if omitted, defaults to C<sync>.
-The mode affects various details of subsequent behaviour - for
-example, see the description of the C<Net::Z3950::Connection> class's
-C<new()> method.
+This is 0 (false) by default, and may be set to 1 (true).  The mode
+affects various details of subsequent behaviour - for example, see the
+description of the C<Net::Z3950::Connection> class's C<new()> method.
 
 =back
 
@@ -126,15 +125,18 @@ sub _default {
     my($type) = @_;
 
     # Used in Net::Z3950::ResultSet::record() to determine whether to wait
-    return 'sync' if $type eq 'mode';
+    return 0 if $type eq 'async';
+    return 'sync' if $type eq 'mode'; # backward-compatible old option
 
     # Used in Net::Z3950::Connection::new() (for INIT request)
     # (Values are mostly derived from what yaz-client does.)
     return 1024*1024 if $type eq 'preferredMessageSize';
     return 1024*1024 if $type eq 'maximumRecordSize';
     return undef if $type eq 'user';
-    return undef if $type eq 'password';
-    return undef if $type eq 'groupid';
+    return undef if $type eq 'pass';
+    return undef if $type eq 'password'; # backward-compatible
+    return undef if $type eq 'group';
+    return undef if $type eq 'groupid'; # backward-compatible
     # (Compare the next three values with those in "yaz/zutil/zget.c".
     # The standard doesn't give much help, just saying:
     #	3.2.1.1.6 Implementation-id, Implementation-name, and
@@ -159,7 +161,7 @@ sub _default {
     return 0 if $type eq 'mediumSetPresentNumber';
     return 'F' if $type eq 'smallSetElementSetName';
     return 'B' if $type eq 'mediumSetElementSetName';
-    return Net::Z3950::RecordSyntax::GRS1 if $type eq 'preferredRecordSyntax';
+    return "GRS-1" if $type eq 'preferredRecordSyntax';
 
     # Used in Net::Z3950::ResultSet::makePresentRequest()
     return 'B' if $type eq 'elementSetName';

@@ -4,7 +4,7 @@ use Net::Z3950;
 $conn = new Net::Z3950::Connection('z3950.loc.gov', 7090,
 				   databaseName => 'Voyager')
     or die "can't connect: $!";
-$conn->option('preferredRecordSyntax', Net::Z3950::RecordSyntax::USMARC);
+$conn->option('preferredRecordSyntax', "USMARC");
 $rs = $conn->search('@attr 1=7 0253333490')
     or die "can't search: " . $conn->errmsg() . " (" . $conn->addinfo() . ")";
 print "found ", $rs->size(), " records:\n";

@@ -1,6 +1,28 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.45 2003/10/24 12:29:05 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.50 2003/12/19 16:09:39 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.39  Fri Dec 19 16:08:35 2003
+	- Recognise record-syntax names such as "USMARC" as well as
+	  enumerators such as Net::Z3950::RecordSyntax::USMARC, in
+	  accordance with what's specified in v1.4 of the ZOOM AAPI.
+	  Such names are recgonised case- and hyphen-insensitively, so
+	  "GRS-1" and "grs1" are equivalent.
+	- Add "XML" as an alias for the "TEXT_XML" record-syntax.
+	- Handle the ZOOM AAPI's standard options "pass" and "group"
+	  in preference to the old options "password" and "groupid"
+	  (although these are still also recognised, for the benefit
+	  of old applications.)
+	- Handle the ZOOM AAPI's standard option "async" in preference
+	  to the old "type" with _value_ "async" (although that's
+	  still also recognised, for the benefit of old applications.)
+	- Makefile.PL includes support for and instructions about
+	  building against a YAZ in a non-standard place ("non-root
+	  install").
+	- Another slight refinement to samples/simple.pl's
+	  diagnostics.
+	- Documentation for diagnostic methods now includes a link to
+	  the BIB-1 diagnostics web-page.
 
 0.38  Fri Oct 24 13:28:42 2003
 	- Fix a silly bug in Net::Z3950::Record::OPAC::rawdata(),

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: batch-isbn.pl,v 1.1 2002/12/11 17:15:46 mike Exp $
+# $Id: batch-isbn.pl,v 1.2 2003/11/21 12:05:47 mike Exp $
 #
 # Fetch records for a batch of books, the ISBNs of which are read from
 # a named file.  Hardwired to use the nasty, slow LoC server.
@@ -26,7 +26,7 @@ my $conn = new Net::Z3950::Connection('z3950.loc.gov', 7090,
 				      databaseName => 'Voyager')
     or die "can't connect to LoC: $!";
 
-$conn->option(preferredRecordSyntax => Net::Z3950::RecordSyntax::USMARC);
+$conn->option(preferredRecordSyntax => "USMARC");
 my $rs = $conn->search($query)
     or die $conn->errmsg();
 my $n = $rs->size();

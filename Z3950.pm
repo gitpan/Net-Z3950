@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.29 2003/10/24 12:29:05 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.31 2003/12/19 15:57:24 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.38';
+$VERSION = '0.39';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -153,8 +153,41 @@ sub GRS0       { 37 }
 sub GRS1       { 38 }
 sub EXTENDED   { 39 }
 sub TEXT_HTML  { 70 }
+sub XML        { 80 }
 sub TEXT_XML   { 80 }
 sub APPLICATION_XML { 81 }
+
+use vars '%map';
+# Maps record-syntax name strings to enumeration members
+%map = (UNIMARC => UNIMARC,
+	INTERMARC => INTERMARC,
+	CCF => CCF,
+	USMARC => USMARC,
+	UKMARC => UKMARC,
+	NORMARC => NORMARC,
+	LIBRISMARC => LIBRISMARC,
+	DANMARC => DANMARC,
+	FINMARC => FINMARC,
+	MAB => MAB,
+	CANMARC => CANMARC,
+	SBN => SBN,
+	PICAMARC => PICAMARC,
+	AUSMARC => AUSMARC,
+	IBERMARC => IBERMARC,
+	CATMARC => CATMARC,
+	MALMARC => MALMARC,
+	EXPLAIN => EXPLAIN,
+	SUTRS => SUTRS,
+	OPAC => OPAC,
+	SUMMARY => SUMMARY,
+	GRS0 => GRS0,
+	GRS1 => GRS1,
+	EXTENDED => EXTENDED,
+	TEXT_HTML => TEXT_HTML,
+	XML => XML,
+	TEXT_XML => TEXT_XML,
+	APPLICATION_XML => APPLICATION_XML,
+	);
 package Net::Z3950;
 
 

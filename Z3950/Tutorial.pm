@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.8 2003/09/06 01:21:18 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.10 2003/11/21 12:05:47 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -303,8 +303,7 @@ server for a record using a different record syntax, then the way to
 do this is to set the C<preferredRecordSyntax> option of the result
 set from which the record is to be fetched:
 
-	$rs->option(preferredRecordSyntax =>
-	            Net::Z3950::RecordSyntax::SUTRS);
+	$rs->option(preferredRecordSyntax => "SUTRS");
 
 The record syntaxes which may be requested are listed in the
 C<Net::Z3950::RecordSyntax> enumeration in the file C<Net/Z3950.pm>;
@@ -480,7 +479,7 @@ the manager is first created:
 	$mgr = new Net::Z3950::Manager(
 		preferredMessageSize => 100*1024,
 		maximumRecordSize => 10*1024*1024,
-		preferredRecordSyntax => Net::Z3950::RecordSyntax::GRS1);
+		preferredRecordSyntax => "GRS-1");
 
 This is I<exactly> equivalent to creating a ``vanilla'' manager with
 C<new Net::Z3950::Manager()>, then setting the three options with the
@@ -508,7 +507,7 @@ section B<OPTION INHERITANCE>.
 
 B<Authentication>
 
-The C<user>, C<password> and C<groupid> options can be specified for a
+The C<user>, C<pass> and C<group> options can be specified for a
 manager so that they are passed as identification tokens at
 initialisation time to any connections opened through that manager.
 The three options are interpreted as follows:
@@ -522,12 +521,12 @@ more or less the same as ``anonymous'' authentication).
 
 =item *
 
-If C<user> is specified but not C<password>, then the value of the
+If C<user> is specified but not C<pass>, then the value of the
 C<user> option is passed as an ``open'' authentication token.
 
 =item *
 
-If both C<user> and C<password> are specified, then their values are
+If both C<user> and C<pass> are specified, then their values are
 passed in an ``idPass'' authentication structure, together with the
 value of C<group> if is it specified.
 
@@ -573,11 +572,10 @@ C<pod2html> does, and there's no sensible way around it.)
 
 =over 4
 
-=item C<mode>
+=item C<async>
 
-C<'sync'>
-(Determines whether a given connection is in synchronous or
-asynchronous mode.)
+C<0>
+(Determines whether a given connection is in asynchronous mode.)
 
 =item C<preferredMessageSize>
 
@@ -591,11 +589,11 @@ C<1024*1024>
 
 C<undef>
 
-=item C<password>
+=item C<pass>
 
 C<undef>
 
-=item C<groupid>
+=item C<group>
 
 C<undef>
 
@@ -650,7 +648,7 @@ C<'b'>
 
 =item C<preferredRecordSyntax>
 
-C<Net::Z3950::RecordSyntax::GRS1>
+C<'GRS-1'>
 
 =item C<elementSetName>
 
