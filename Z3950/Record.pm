@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.4 2001/10/12 15:16:13 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.5 2001/10/19 15:40:25 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -297,6 +297,35 @@ sub nfields {
 
 sub render {
     return "[can't render a Net::Z3950::Record::XML - not yet implemented]\n";
+}
+
+sub rawdata {
+    my $this = shift();
+    return $$this;
+}
+
+
+=head2 Net::Z3950::Record::OPAC
+
+Represents a a record using the OPAC (Online Public Access Catalogue)
+record syntax, as defined in Appendix 5 (REC) of the Z39.50 standard
+at http://lcweb.loc.gov/z3950/agency/asn1.html#RecordSyntax-opac
+
+Rendering is not currently defined: this module treats the record as a
+single opaque lump of data, to be parsed by other software.
+
+=cut
+
+package Net::Z3950::Record::OPAC;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::OPAC);
+
+sub nfields {
+    return 1;			### not entirely true
+}
+
+sub render {
+    return "[can't render a Net::Z3950::Record::OPAC - not yet implemented]\n";
 }
 
 sub rawdata {

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.8 2001/10/18 13:30:37 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.9 2001/10/19 15:40:25 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.3 2001/10/12 15:16:14 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.4 2001/10/19 15:40:25 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -478,8 +478,10 @@ static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 	{ VAL_LIBRISMARC,	"Net::Z3950::Record::LIBRISMARC" },
 	{ VAL_DANMARC,		"Net::Z3950::Record::DANMARC" },
 	{ VAL_UNIMARC,		"Net::Z3950::Record::UNIMARC" },
+	{ VAL_UNIMARC,		"Net::Z3950::Record::UNIMARC" },
 	{ VAL_TEXT_XML,		"Net::Z3950::Record::XML" },
 	{ VAL_APPLICATION_XML,	"Net::Z3950::Record::XML" },
+	{ VAL_OPAC,		"Net::Z3950::Record::OPAC" },
 	{ VAL_NOP }		/* end marker */
 	/* ### etc. */
     };

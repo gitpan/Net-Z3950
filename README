@@ -1,4 +1,4 @@
-$Header: /home/cvsroot/NetZ3950/README,v 1.6 2001/10/12 16:01:45 mike Exp $
+$Header: /home/cvsroot/NetZ3950/README,v 1.7 2001/10/19 15:40:25 mike Exp $
 
 Net::Z3950.pm -- What Is It?
 ----------------------------
@@ -10,7 +10,7 @@ geo-spatial mapping, museums and other cultural heritage information,
 and structured vocabulary navigation.
 
 Up to date information on this module can be found at
-http://perl.z3950.org/nz/index.html
+http://perl.z3950.org/
 
 Net::Z3950.pm is an implementation of the Perl binding for ZOOM, the
 Z39.50 Objct Orientation Model.  Bindings for the same abstract API

@@ -1,6 +1,14 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.9 2001/10/18 13:29:23 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.10 2001/10/19 15:40:25 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.22  Fri Oct 19 16:37:44 2001
+	- Add rudimentary ("straight through") support for the OPAC
+	  record syntax.
+	- Fix URLs for perl.z3950.org to omit obsolete /nz/ directory.
+	- Fix "make clean" in doc directory to remote the Z3950
+	  subdirectory.
+	- Fix documentation stylesheet to match perl.z3950.org
 
 0.21  Thu Oct 18 14:29:06 2001
 	- Fix samples/multiplex.pl not to die when one server fails a

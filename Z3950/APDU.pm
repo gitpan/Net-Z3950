@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.4 2001/10/18 13:29:23 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.5 2001/10/19 15:40:25 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -52,6 +52,10 @@ sub DESTROY {
     # away, and that was getting translated into a call to AUTOLOAD,
     # which was complaining "field `DESTROY' not defined".  Now that
     # we have an explicit no-opping DESTROY, that shouldn't happen.
+    #
+    # The only discussion I have found anywhere of DESTROY/AUTOLOAD
+    # interaction is this thread on comp.lang.perl.moderated:
+    #	http://groups.google.com/groups?hl=en&frame=right&th=1bc05ce0aff89451&seekm=86r9qpmvbv.fsf%40lion.plab.ku.dk#link1
 }
 
 
@@ -236,9 +240,9 @@ sub FinalFragment        { 5 }
 package Net::Z3950;
 
 
-=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC, Net::Z3950::APDU::UNIMARC
+=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC, Net::Z3950::APDU::UNIMARC, Net::Z3950::APDU::OPAC
 
-No methods - just treat as a string.
+No methods - just treat as an opaque chunk of data.
 
 =cut
 
@@ -249,6 +253,7 @@ package Net::Z3950::APDU::NORMARC;
 package Net::Z3950::APDU::LIBRISMARC;
 package Net::Z3950::APDU::DANMARC;
 package Net::Z3950::APDU::UNIMARC;
+package Net::Z3950::APDU::OPAC;
 
 
 =head2 Net::Z3950::APDU::GRS1
