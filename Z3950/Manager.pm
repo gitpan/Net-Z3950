@@ -1,4 +1,4 @@
-# $Id: Manager.pm,v 1.19 2004/03/16 14:13:30 mike Exp $
+# $Id: Manager.pm,v 1.21 2004/03/17 14:13:06 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -225,6 +225,9 @@ earlier INIT, SEARCH or PRESENT - the handle of the connection on
 which it occurred is returned: the handle can be further interrogated
 with its C<op()> and related methods.
 
+If the wait times out (only possible if the manager's C<timeout>
+option has been set), then C<wait()> returns an undefined value.
+
 =cut
 
 sub wait {
@@ -244,7 +247,8 @@ sub wait {
 
     my $timeout = $this->option("timeout");
     # Stupid Event::loop() makes a distinction between undef and not there
-    return defined $timeout ? Event::loop($timeout) : Event::loop();
+    my $conn = defined $timeout ? Event::loop($timeout) : Event::loop();
+    return ref $conn ? $conn : undef;
 }
 
 

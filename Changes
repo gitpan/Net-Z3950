@@ -1,8 +1,14 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.51 2004/03/16 14:13:30 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.53 2004/03/17 14:13:06 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
 
-0.40  Tue Mar 16 13:57:33 GMT 2004
+0.41  Wed Mar 17 13:33:43 2004
+	- When Net::Z3950::Manager::wait() times out, it now returns
+	  an undefined value rather than, as in v0.40, the timeout
+	  value.  This code is now tested, thanks to Rick Jansen.
+	- Minor changes to some of the logic in ResultSet.pm
+
+0.40  Tue Mar 16 13:57:33 2004
 	- A timeout may be set for a Net::Z3950::Manager's wait() by
 	  setting that manager's "timeout" option to the maximum
 	  number of seconds to wait.  Donald Knuth once wrote,
@@ -363,12 +369,18 @@ Revision history for Perl extension Net::Z3950.
 --
 
 To be done:
-	- Use the newer MARC::Record module instead of MARC.pm
-		### Not yet done
+	- ### Use the newer MARC::Record module instead of MARC.pm
 		Render with  MARC::File::USMARC::decode($rec->rawdata())
 		Or with      MARC::Record ->as_formatted()
 	- ### Fix test.pl to work against either local or remote server.
 	- ### Make managers drop references to closed connections.
 	- ### Make $mgr->wait() finish when there are no connections left.
-	- ### Add optional timeout parameter to $mgr->wait()
+	- ### Do away with the "async" option, probably.  Here's what
+		it actually does when turned on (the default):
+		- Connection::new() waits for an Init response before
+		  returning.
+		- ResultSet::present() (and hence ResultSet::record())
+		  waits for for a Present response before returning.
+		See also the comment on the Connection::search()
+		method.
 

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.15 2003/11/21 12:05:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.16 2004/03/17 14:13:06 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -119,11 +119,11 @@ retrieval.
 
 Note that C<$start> is indexed from 1.
 
-Returns a boolean indicating whether the record(s) were successfully
-retrieved.
+Returns 1 if the records were successfully retrieved, 0 if an error
+occurred, and an undefined value if they were merely scheduled for
+retrieval because this is an asynchronous operation.
 
 =cut
-
 
 sub present {
     my ($this, $start, $count) = @_;
@@ -153,7 +153,7 @@ sub present {
 
     if ($this->option('async')) {
 	$this->{errcode} = 0;
-	return 1;
+	return undef;
     }
 
     # Synchronous-mode request for a record that we don't yet have.
@@ -164,7 +164,7 @@ sub present {
 	# Error code and addinfo are in the connection: copy them across
 	$this->{errcode} = $this->{conn}->{errcode};
 	$this->{addinfo} = $this->{conn}->{addinfo};
-	return undef;
+	return 0;
     }
     return 1;
 }
@@ -201,19 +201,20 @@ sub record {
     if (!defined $rec or not ref $rec) {
 	# Record not in place yet
 
-	$this->present($which, $this->option('prefetch') || 1)
-	    or return undef;
-
-	if ($this->option('async')) {
+	my $status = $this->present($which, $this->option('prefetch') || 1);
+	if (!defined $status) {
+	    # Operation was asynchronous: request was merely queued
 	    $this->{errcode} = 0;
 	    return undef;
+	} elsif (!$status) {
+	    # An actual error: the code/addInfo have already been set
+	    return undef;
 	}
-
-	$rec = $this->{records}{$this->option('elementSetName')}[$which];
 
 	# The _add_records() callback invoked by the event loop should now
 	# have inserted the requested record into our array, so we should
 	# just be able to return it.  Sanity-check first, though.
+	$rec = $this->{records}{$this->option('elementSetName')}[$which];
 	die "record(): impossible: didn't get record" if !defined $rec;
     }
 
@@ -629,7 +630,7 @@ sub delete {
     my $dr = Net::Z3950::makeDeleteRSRequest($refId,
 					     $this->{rsName},
 					     $errmsg);
-    die "can't make present request: $errmsg" if !defined $dr;
+    die "can't make delete-RS request: $errmsg" if !defined $dr;
     my $conn = $this->{conn};
     $conn->_enqueue($dr);
 

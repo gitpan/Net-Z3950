@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.11 2004/03/16 14:13:30 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.12 2004/03/17 14:13:06 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -581,7 +581,8 @@ A function to invoke if C<die()> is called within the main event loop.
 
 C<undef>
 The maximum number of seconds a manager will wait when its C<wait()>
-method is called.  B<Can not be set on a per-connection basis.>
+method is called.  If the timeout elapses, C<wait()> returns an
+undefined value.  B<Can not be set on a per-connection basis.>
 
 =item C<async>
 
