@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.6 2002/01/29 10:34:15 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.7 2002/02/27 17:28:54 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -560,19 +560,31 @@ static SV *translateDefaultDiagFormat(Z_DefaultDiagFormat *x)
 
 static SV *translateOID(Odr_oid *x)
 {
-    /* Yaz represents an OID by an int arrays terminated by a negative
+    /* Yaz represents an OID by an int array terminated by a negative
      * value, typically -1; we represent it as a reference to a
-     * blessed array of scalar elements.
+     * blessed scalar string of "."-separated elements.
      */
-    SV *sv;
-    AV *av;
+    char buf[1000];
     int i;
 
-    sv = newObject("Net::Z3950::APDU::OID", (SV*) (av = newAV()));
-    for (i = 0; x[i] >= 0; i++)
-	av_push(av, newSViv(x[i]));
+    *buf = '\0';
+    for (i = 0; x[i] >= 0; i++) {
+	sprintf(buf + strlen(buf), "%d", (int) x[i]);
+	if (x[i+1] >- 0)
+	    strcat(buf, ".");
+    }
 
-    return sv;
+    /*
+     * ### We'd like to return a blessed scalar (string) here, but of
+     *	course you can't do that in Perl: only references can be
+     *	blessed, so we'd have to return a _reference_ to a string, and
+     *	bless _that_.  Better to do without the blessing, I think.
+     */
+    if (1) {
+	return newSVpv(buf, 0);
+    } else {
+	return newObject("Net::Z3950::APDU::OID", newSVpv(buf, 0));
+    }
 }
 
 
@@ -589,7 +601,6 @@ static SV *newObject(char *class, SV *referent)
     stash = gv_stashpv(class, 0);
     if (stash == 0)
 	fatal("attempt to create object of undefined class '%s'", class);
-    /*assert(stash != 0);*/
     sv_bless(sv, stash);
     return sv;
 }

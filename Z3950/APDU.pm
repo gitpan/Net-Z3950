@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.6 2002/01/22 16:02:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.7 2002/02/27 17:28:54 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -291,9 +291,10 @@ sub _fields { @FIELDS };
 	which()
 	numeric()
 	string()
+	oid()
 	subtree()
 
-Only one of the last three methods will return anything - you can find
+Only one of the last four methods will return anything - you can find
 out which one by inspecting the return value of the C<which()> method,
 which always takes one of the following values:
 
@@ -309,7 +310,11 @@ Net::Z3950::ElementData::String
 
 =item *
 
-Net::Z3950::ElementData::subtree
+Net::Z3950::ElementData::OID
+
+=item *
+
+Net::Z3950::ElementData::Subtree
 
 =item *
 
@@ -367,7 +372,18 @@ sub _fields { @FIELDS };
 
 =head2 Net::Z3950::APDU::OID
 
-No methods - just treat as a reference to an array of integers.
+B<No longer exists.>
+Previously this class had no methods - calling code just treated it
+as a reference to an array of integers.  However, since the only thing
+anyone (including C<Net::Z3950::Record::GRS1::render()>)
+ever did with it was smush it up into a string with
+
+	join('.', @$oidRef)
+
+we now just return the dot-separated OID string
+I<not blessed into any class>
+(because scalars can't be blessed - only I<references> to scalars,
+and we don't want the extra useless level of indirection).
 
 =cut
 

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.4 2002/01/22 16:02:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.5 2002/02/27 17:28:54 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -312,9 +312,13 @@ syntax can be determined using the universal C<isa()> method:
 		process_marc_record($raw);
 	} # etc.
 
+=head2 MARC RECORDS
+
 For further manipulation of MARC records, we recommend the existing
 MARC module in Ed Summers's directory at CPAN,
 http://cpan.valueclick.com/authors/id/E/ES/ESUMMERS/
+
+=head2 GRS-1 RECORDS
 
 The raw data of GRS-1 records in the C<Net::Z3950> module closely
 follows the structure of physcial GRS-1 records - see Appendices REC.5
@@ -341,14 +345,48 @@ tag-values.
 
 =item *
 
-The content of an element is an object of one of the subtypes of
-C<Net::Z3950::ElementData>.  These include
-C<Net::Z3950::ElementData::Numeric> and
-C<Net::Z3950::ElementData::String> (both self-explanatory), and
-C<Net::Z3950::ElementData::OID> (a reference to an array of integers).
-The fourth, and more interesting content-type is
-C<Net::Z3950::ElementData::Subtree> - a reference to another whole
-C<Net::Z3950::Record::GRS1>, enabling arbitrary recursive nesting.
+The C<content()> of an element is an object of type
+C<Net::Z3950::ElementData>.  Its C<which()> method returns a constant
+indicating the type of the content, which may be any of the following:
+
+=over 4
+
+=item *
+
+C<Net::Z3950::ElementData::Numeric>
+indicates that the content is a number;
+access it via the
+C<numeric()>
+method.
+
+=item *
+
+C<Net::Z3950::ElementData::String>
+indicates that the content is a string of characters;
+access it via the
+C<string()>
+method.
+
+=item *
+
+C<Net::Z3950::ElementData::OID>
+indicates that the content is an OID, represented as a string with the
+components separated by periods (``C<.>'');
+access it via the
+C<oid()>
+method.
+
+=item *
+
+C<Net::Z3950::ElementData::Subtree>
+is
+a reference to another C<Net::Z3950::Record::GRS1> object, enabling
+arbitrary recursive nesting;
+access it via the
+C<subtree()>
+method.
+
+=back
 
 =back
 

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.6 2002/01/22 16:02:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.7 2002/02/27 17:28:54 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -174,7 +174,7 @@ sub _render_content {
     } elsif ($which == Net::Z3950::ElementData::String) {
 	return '"' . $val->string() . '"' . "\n";
     } elsif ($which == Net::Z3950::ElementData::OID) {
-	return join('.', @{$val->oid()}) . "\n";
+	return $val->oid() . "\n";
     } elsif ($which == Net::Z3950::ElementData::Subtree) {
 	#   ###	This re-blessing is an ugly way to cope with $val
 	#	being The Wrong Kind Of GRS1 Object, since it has the

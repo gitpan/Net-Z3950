@@ -1,6 +1,19 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.18 2002/02/11 12:57:34 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.19 2002/02/27 17:28:54 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.28  Wed Feb 27 17:28:26 2002
+	- Change representation of OIDs from blessed reference to
+	  array of intergers to Boring Old String (dot-separated
+	  numbers).  Resulting tweaks elsewhere in the module, e.g. in
+	  GRS::render()
+	- Fix Tutorial's incorrect description of the GRS-1 record
+	  structure.  How come no-one noticed this gross error in all
+	  the time it was there?
+	- Minor fixes to the APDU class's documentation (but you
+	  shouldn't be reading that anyway :-)
+	- Fix the top-level documentation file (index.html) to use the
+	  same stylesheet as all the API documentation.
 
 0.27  Mon Feb 11 12:59:05 2002
 	- Incorporate a patch from Adam <adam@indexdata.dk> to allow
