@@ -1,6 +1,27 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.38 2003/06/27 09:49:04 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.43 2003/09/12 22:47:45 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.36  Fri Sep 12 23:47:00 2003
+	- Add support for the OPAC record syntax: OPAC records are now
+	  translated into self-describing Perl data-structures,
+	  blessed into the class Net::Z3950::Record::OPAC.  There is a
+	  rudimentary renderer included in that class, but
+	  sophisticated applications will want to deal with the data
+	  structure itself.  To see it in action, use something like:
+		$ perl samples/simple.pl alpha.calarts.edu 210 \
+			MARION fruit preferredRecordSyntax 35
+	  WARNING: for some servers, e.g. troy.lib.sfu.ca:210/innopac,
+	  you MUST request elementSetName "F", otherwise you'll just
+	  be fed USMARC records whatever your preferredRecordSyntax.
+	- Deal better with unrecognised or malformed APDUs from the
+	  server, e.g. library.ucfv.bc.ca:2200/unicorn when asked 
+	  for the USMARC record found by "@attr 1=4 time".  Now, the
+	  operation fails with diagnostic code 1001 (Malformed APDU).
+	- Change all <mike@tecc.co.uk> addresses to
+	  <mike@indexdata.com>.  (This change is well overdue, since I
+	  changed jobs seven months ago!)
+	- Fix reference for PQF in the YAZ manual.
 
 0.35  Fri Jun 27 10:48:03 2003
 	- Fix all non-US MARC record-types to return raw data from the

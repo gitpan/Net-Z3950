@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.7 2002/11/27 12:41:20 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.8 2003/09/06 01:21:18 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -134,7 +134,7 @@ B<Prefix Queries>
 
 	$rs = $conn->search(-prefix => '@or rock @attr 1=21 mineral');
 
-Prefix Query Notation is fully described in section 4.1 (B<Query
+Prefix Query Notation is fully described in section 8.1 (B<Query
 Syntax Parsers>) of the Yaz toolkit documentation, B<YAZ User's Guide
 and Reference>.
 
@@ -185,7 +185,7 @@ B<CCL Queries>
 
 CCL is formally specified in the international standard ISO 8777
 (B<Commands for interactive text searching>) and also described in
-section 4.1 (B<Query Syntax Parsers>) of the Yaz toolkit
+section 8.1 (B<Query Syntax Parsers>) of the Yaz toolkit
 documentation, B<YAZ User's Guide and Reference>.
 
 Briefly, however, there is a set of well-known keywords including
@@ -697,7 +697,7 @@ C<Net::Z3950::Record>.
 
 =head1 AUTHOR
 
-Mike Taylor E<lt>mike@tecc.co.ukE<gt>
+Mike Taylor E<lt>mike@indexdata.comE<gt>
 
 First version Sunday 28th January 2001.
 

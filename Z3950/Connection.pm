@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.15 2003/06/27 09:45:29 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.20 2003/09/12 22:31:30 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -176,7 +176,7 @@ sub new {
 
 	if (!$this->initResponse()->result()) {
 	    warn "checking initResponse";
-	    # Avoid having too may references hanging around, or we
+	    # Avoid having too many references hanging around, or we
 	    # end up closing the file twice, as various destructors
 	    # are called, and $! gets set to EBADF.
 	    undef $sock;
@@ -238,12 +238,18 @@ sub _ready_to_read {
 	# wait until we get called again with the next chunk.
 
     } elsif ($reason == Net::Z3950::Reason::Malformed) {
-	$watcher->cancel();	
-	die "[$addr] malformed APDU (server doesn't speak Z39.50?)\n";
+	$conn->{errcode} = 1001; # Malformed APDU
+	$conn->{addinfo} = "client couldn't decode server response";
+	$watcher->cancel();
 
     } elsif ($reason == Net::Z3950::Reason::BadAPDU) {
-	die "[$addr] unrecognised APDU: never mind\n";
-	# No need to shut down the connection: it's probably our fault.
+	# This just means that although the APDU was well-formed, it's
+	# not one that we unrecognise -- for example, a Segment
+	# request.  It's tempting to paper over the crack, but I think
+	# the honest thing to do at this point is croak.
+	$conn->{errcode} = 100; # "Unknown error" is a bit feeble
+	$conn->{addinfo} = "got APDU of unsupported type";
+	$watcher->cancel();
 
     } elsif ($reason == Net::Z3950::Reason::Error) {
 	$watcher->cancel();
@@ -801,7 +807,7 @@ sub close {
     my $this = shift();
 
     my $mgr = delete $this->{mgr};
-    $mgr->forget($this);
+    $mgr->forget($this) if defined $mgr; ### but it should always be!
 
     $this->{idleWatcher}->cancel() if defined $this->{idleWatcher};
     $this->{readWatcher}->cancel() if defined $this->{readWatcher};
@@ -838,7 +844,7 @@ sub DESTROY {
 
 =head1 AUTHOR
 
-Mike Taylor E<lt>mike@tecc.co.ukE<gt>
+Mike Taylor E<lt>mike@indexdata.comE<gt>
 
 First version Tuesday 23rd May 2000.
 

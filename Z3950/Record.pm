@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.10 2003/05/14 13:50:10 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.11 2003/09/06 01:22:24 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -231,8 +231,10 @@ sub render {
     require MARC;
     my $inc = MARC::Rec->new();
     my($rec, $status) = $inc->nextrec($this->rawdata());
-    return "[can't translate MARC record]"
+    return "[can't translate MARC record]\n"
 	if !$status;
+    return "[translated MARC record to undefined value!]\n"
+	if !defined $rec;
     return $rec->output({ format => 'ascii' });
 }
 
@@ -338,9 +340,6 @@ Represents a a record using the OPAC (Online Public Access Catalogue)
 record syntax, as defined in Appendix 5 (REC) of the Z39.50 standard
 at http://lcweb.loc.gov/z3950/agency/asn1.html#RecordSyntax-opac
 
-Rendering is not currently defined: this module treats the record as a
-single opaque lump of data, to be parsed by other software.
-
 =cut
 
 package Net::Z3950::Record::OPAC;
@@ -352,7 +351,24 @@ sub nfields {
 }
 
 sub render {
-    return "[can't render a Net::Z3950::Record::OPAC - not yet implemented]\n";
+    my $this = shift();
+
+    my $res;
+    my $bib = $this->{bibliographicRecord};
+    if (defined $bib) {
+	$res = $bib->render();
+    } else {
+	$res = "[no bibliographic record]\n";
+    }
+
+    $res .= $this->{num_holdingsData} . " holdings records:\n";
+    my $h = $this->{holdingsData};
+    foreach my $hr (@$h) {
+	use Data::Dumper;
+	$res .= " - $hr = " . Dumper($hr) . "\n";
+    }
+
+    return $res;
 }
 
 sub rawdata {
@@ -417,7 +433,7 @@ sub rawdata {
 
 =head1 AUTHOR
 
-Mike Taylor E<lt>mike@tecc.co.ukE<gt>
+Mike Taylor E<lt>mike@indexdata.comE<gt>
 
 First version Sunday 4th May 2000.
 

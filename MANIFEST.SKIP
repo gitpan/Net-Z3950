@@ -4,6 +4,7 @@ Z3950/CVS
 doc/.cvsignore
 doc/CVS
 samples/CVS
+samples/nz-client
 samples/tmp
 yazwrap/.cvsignore
 yazwrap/CVS

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.10 2003/06/26 22:20:17 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.11 2003/09/06 01:44:40 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -166,7 +166,9 @@ sub _fields { @FIELDS };
 	closeReason()
 	diagnosticInformation()
 
-	as_text()	(render fields as printable string)
+In addition, this class provides a method of no arguments,
+C<as_text()>, which returns a human-readable string describing the
+reason for the close.
 
 =cut
 
@@ -204,8 +206,6 @@ sub as_text {
 
     $text;
 }
-
-
 
 
 =head2 Net::Z3950::APDU::NamePlusRecordList
@@ -284,6 +284,10 @@ Net::Z3950::Record::XML
 
 Net::Z3950::Record::HTML
 
+=item *
+
+Net::Z3950::Record::OPAC
+
 I<### others, not yet supported>
 
 =back
@@ -311,7 +315,7 @@ sub FinalFragment        { 5 }
 package Net::Z3950;
 
 
-=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC, Net::Z3950::APDU::UNIMARC, Net::Z3950::APDU::OPAC, Net::Z3950::APDU::MAB
+=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC, Net::Z3950::APDU::UNIMARC, Net::Z3950::APDU::MAB
 
 No methods - just treat as an opaque chunk of data.
 
@@ -324,18 +328,7 @@ package Net::Z3950::APDU::NORMARC;
 package Net::Z3950::APDU::LIBRISMARC;
 package Net::Z3950::APDU::DANMARC;
 package Net::Z3950::APDU::UNIMARC;
-package Net::Z3950::APDU::OPAC;
 package Net::Z3950::APDU::MAB;
-
-
-=head2 Net::Z3950::APDU::GRS1
-
-No methods - just treat as a reference to an array of
-C<Net::Z3950::APDU::TaggedElement>
-
-=cut
-
-package Net::Z3950::APDU::GRS1;
 
 
 =head2 Net::Z3950::APDU::TaggedElement;
@@ -411,6 +404,126 @@ sub Subtree { 13 }
 package Net::Z3950;
 
 
+=head2 Net::Z3950::APDU::HoldingsData
+
+No methods - just treat as a reference to an array of objects, where
+each object is either an MARC holdings record (of type
+C<Net::Z3950::Record::USMARC> or similar) or a
+C<Net::Z3950::APDU::HoldingsAndCirc>
+
+=cut
+
+package Net::Z3950::APDU::HoldingsData;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::APDU);
+
+
+=head2 Net::Z3950::APDU::HoldingsAndCirc
+
+	typeOfRecord()
+	encodingLevel()
+	format()
+	receiptAcqStatus()
+	generalRetention()
+	completeness()
+	dateOfReport()
+	nucCode()
+	localLocation()
+	shelvingLocation()
+	callNumber()
+	shelvingData()
+	copyNumber()
+	publicNote()
+	reproductionNote()
+	termsUseRepro()
+	enumAndChron()
+	volumes()
+	circulationData()
+
+All but the last two of these have string values, although not
+necessarily human-readable strings.  C<volumes()> returns a
+C<Net::Z3950::APDU::Volumes> object (note the plural in the
+type-name), and C<circulationData()> a
+C<Net::Z3950::APDU::CirculationData>.
+
+=cut
+
+package Net::Z3950::APDU::HoldingsAndCirc;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(typeOfRecord encodingLevel format receiptAcqStatus
+	     generalRetention completeness dateOfReport nucCode
+	     localLocation shelvingLocation callNumber shelvingData
+	     copyNumber publicNote reproductionNote termsUseRepro
+	     enumAndChron volumes circulationData);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::Volumes
+
+No methods - just treat as a reference to an array of
+C<Net::Z3950::APDU::Volume>
+objects.
+
+=cut
+
+package Net::Z3950::APDU::Volumes;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::APDU);
+
+
+=head2 Net::Z3950::APDU::HoldingsAndCirc
+
+	enumeration()
+	chronology()
+	enumAndChron()
+
+=cut
+
+package Net::Z3950::APDU::Volume;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(enumeration chronology enumAndChron);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::CirculationData
+
+No methods - just treat as a reference to an array of
+C<Net::Z3950::APDU::CircRecord>
+objects.
+
+=cut
+
+package Net::Z3950::APDU::CirculationData;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::APDU);
+
+
+
+=head2 Net::Z3950::APDU::HoldingsAndCirc
+
+	availableNow()
+	availablityDate()
+	availableThru()
+	restrictions()
+	itemId()
+	renewable()
+	onHold()
+	enumAndChron()
+	midspine()
+	temporaryLocation()
+
+=cut
+
+package Net::Z3950::APDU::CircRecord;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(availableNow availablityDate availableThru restrictions
+	     itemId renewable onHold enumAndChron midspine
+	     temporaryLocation);
+sub _fields { @FIELDS };
+
 =head2 Net::Z3950::APDU::DiagRecs
 
 No methods - just treat as a reference to an array of object
@@ -461,10 +574,11 @@ package Net::Z3950::APDU::OID;
 
 =head1 AUTHOR
 
-Mike Taylor E<lt>mike@tecc.co.ukE<gt>
+Mike Taylor E<lt>mike@indexdata.comE<gt>
 
 First version Saturday 27th May 2000.
 
 =cut
+
 
 1;

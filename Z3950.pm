@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.24 2003/06/26 22:20:17 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.27 2003/09/12 15:42:56 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.35';
+$VERSION = '0.36';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -237,6 +237,8 @@ the Z39.50 BIB-1 diagnostic error code I<$errcode>.
 
 sub errstr {
     my($errcode) = @_;
+
+    die "errstr() called with undefined argument" if !defined $errcode;
     return "not yet available (try again later)" if $errcode == 0;
     return diagbib1_str($errcode);
 }
@@ -267,7 +269,7 @@ sub opstr {
 
 =head1 AUTHOR
 
-Mike Taylor E<lt>mike@tecc.co.ukE<gt>
+Mike Taylor E<lt>mike@indexdata.comE<gt>
 
 First version Tuesday 23rd May 2000.
 

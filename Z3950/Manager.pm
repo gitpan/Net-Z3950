@@ -1,4 +1,4 @@
-# $Id: Manager.pm,v 1.11 2003/06/27 09:45:29 mike Exp $
+# $Id: Manager.pm,v 1.13 2003/09/12 22:04:20 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -307,7 +307,8 @@ sub forget {
 	}
     }
 
-    die "$this can't forget $conn";
+    # This happens far too often (why?) to be allowed
+    #die "$this can't forget $conn";
 }
 
 
@@ -320,7 +321,7 @@ sub DESTROY {
 
 =head1 AUTHOR
 
-Mike Taylor E<lt>mike@tecc.co.ukE<gt>
+Mike Taylor E<lt>mike@indexdata.comE<gt>
 
 First version Tuesday 23rd May 2000.
 

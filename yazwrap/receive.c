@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.11 2003/06/26 22:20:17 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.13 2003/09/12 14:34:51 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -30,6 +30,11 @@ static SV *translateGenericRecord(Z_GenericRecord *x);
 static SV *translateTaggedElement(Z_TaggedElement *x);
 static SV *translateStringOrNumeric(Z_StringOrNumeric *x);
 static SV *translateElementData(Z_ElementData *x);
+static SV *translateOPACRecord(Z_OPACRecord *x);
+static SV *translateHoldingsRecord(Z_HoldingsRecord *x);
+static SV *translateHoldingsAndCirc(Z_HoldingsAndCircData *x);
+static SV *translateVolume(Z_Volume *x);
+static SV *translateCircRecord(Z_CircRecord *x);
 static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference);
 static SV *translateFragmentSyntax(Z_FragmentSyntax *x);
 static SV *translateDiagRecs(Z_DiagRecs *x);
@@ -112,7 +117,7 @@ SV *decodeAPDU(COMSTACK cs, int *reasonp)
 	 * have got a >1 response from cs_get()).  There's nothing we
 	 * can do about it.
 	 */
-	*reasonp = REASON_BADAPDU;
+	*reasonp = REASON_MALFORMED;
 	return 0;
     }
 
@@ -393,6 +398,8 @@ static SV *translateExternal(Z_External *x)
 	return translateSUTRS(x->u.sutrs);
     case Z_External_grs1:
 	return translateGenericRecord(x->u.grs1);
+    case Z_External_OPAC:
+	return translateOPACRecord(x->u.opac);
     case Z_External_octet:
 	/* This is used for any opaque data-block (i.e. just a hunk of
 	 * octets) -- in particular, for records in any of the *MARC
@@ -477,10 +484,10 @@ static SV *translateStringOrNumeric(Z_StringOrNumeric *x)
 
 /*
  * It's tempting to treat this data by simply returning an appropriate
- * Perl data structure, no bothering with an explicit discriminator --
+ * Perl data structure, not bothering with an explicit discriminator --
  * as translateStringOrNumeric() does for its data -- but that would
  * mean (for example) that we couldn't tell the difference between
- * elementNotThere, elementNotEmpty and noDataRequested.  This would
+ * elementNotThere, elementEmpty and noDataRequested.  This would
  * be A Bad Thing, since it's not this code's job to fix bugs in the
  * standard :-)  Instead, we return an object with an explicit `which'
  * element, as translateNamePlusRecord() does.
@@ -514,6 +521,150 @@ static SV *translateElementData(Z_ElementData *x)
 }
 
 
+static SV *translateOPACRecord(Z_OPACRecord *x)
+{ 
+    SV *sv, *sv2;
+    HV *hv;
+    AV *av;
+    int i;
+
+    sv = newObject("Net::Z3950::Record::OPAC", (SV*) (hv = newHV()));
+    setMember(hv, "bibliographicRecord",
+	      translateExternal(x->bibliographicRecord));
+    setNumber(hv, "num_holdingsData", x->num_holdingsData);
+
+    sv2 = newObject("Net::Z3950::APDU::HoldingsData", (SV*) (av = newAV()));
+    for (i = 0; i < x->num_holdingsData; i++)
+	av_push(av, translateHoldingsRecord(x->holdingsData[i]));
+    setMember(hv, "holdingsData", sv2);
+
+    return sv;
+}
+
+
+static SV *translateHoldingsRecord(Z_HoldingsRecord *x)
+{
+    switch (x->which) {
+    case Z_HoldingsRecord_marcHoldingsRecord:
+	return translateExternal(x->u.marcHoldingsRecord);
+    case Z_HoldingsRecord_holdingsAndCirc:
+	return translateHoldingsAndCirc(x->u.holdingsAndCirc);
+    default:
+	break;
+    }
+    fatal("illegal `which' in Z_HoldingsRecord");
+    return 0;			/* NOTREACHED; inhibit gcc -Wall warning */
+}
+
+
+static SV *translateHoldingsAndCirc(Z_HoldingsAndCircData *x)
+{
+    SV *sv, *sv2;
+    HV *hv;
+    AV *av;
+    int i;
+
+    sv = newObject("Net::Z3950::APDU::HoldingsAndCirc", (SV*) (hv = newHV()));
+    if (x->typeOfRecord)
+	setString(hv, "typeOfRecord", x->typeOfRecord);
+    if (x->encodingLevel)
+	setString(hv, "encodingLevel", x->encodingLevel);
+    if (x->format)
+	setString(hv, "format", x->format);
+    if (x->receiptAcqStatus)
+	setString(hv, "receiptAcqStatus", x->receiptAcqStatus);
+    if (x->generalRetention)
+	setString(hv, "generalRetention", x->generalRetention);
+    if (x->completeness)
+	setString(hv, "completeness", x->completeness);
+    if (x->dateOfReport)
+	setString(hv, "dateOfReport", x->dateOfReport);
+    if (x->nucCode)
+	setString(hv, "nucCode", x->nucCode);
+    if (x->localLocation)
+	setString(hv, "localLocation", x->localLocation);
+    if (x->shelvingLocation)
+	setString(hv, "shelvingLocation", x->shelvingLocation);
+    if (x->callNumber)
+	setString(hv, "callNumber", x->callNumber);
+    if (x->shelvingData)
+	setString(hv, "shelvingData", x->shelvingData);
+    if (x->copyNumber)
+	setString(hv, "copyNumber", x->copyNumber);
+    if (x->publicNote)
+	setString(hv, "publicNote", x->publicNote);
+    if (x->reproductionNote)
+	setString(hv, "reproductionNote", x->reproductionNote);
+    if (x->termsUseRepro)
+	setString(hv, "termsUseRepro", x->termsUseRepro);
+    if (x->enumAndChron)
+	setString(hv, "enumAndChron", x->enumAndChron);
+
+    sv2 = newObject("Net::Z3950::APDU::Volumes", (SV*) (av = newAV()));
+    for (i = 0; i < x->num_volumes; i++)
+	av_push(av, translateVolume(x->volumes[i]));
+    setMember(hv, "volumes", sv2);
+
+    sv2 = newObject("Net::Z3950::APDU::CirculationData", (SV*) (av = newAV()));
+    for (i = 0; i < x->num_circulationData; i++)
+	av_push(av, translateCircRecord(x->circulationData[i]));
+    setMember(hv, "circulationData", sv2);
+
+    Z_Volume **volumes;
+    Z_CircRecord **circulationData;
+
+    return sv;
+}
+
+
+static SV *translateVolume(Z_Volume *x)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::Volume", (SV*) (hv = newHV()));
+    if (x->enumeration)
+	setString(hv, "enumeration", x->enumeration);
+    if (x->chronology)
+	setString(hv, "chronology", x->chronology);
+    if (x->enumAndChron)
+	setString(hv, "enumAndChron", x->enumAndChron);
+
+    return sv;
+}
+
+
+static SV *translateCircRecord(Z_CircRecord *x)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::CircRecord", (SV*) (hv = newHV()));
+    setNumber(hv, "availableNow", *x->availableNow);
+    /* Note the typo in the next line.  It goes right back to the
+       ASN.1 in the printed Z39.50-1995 standard, so the honest thing
+       here seems to be to propagate it into the Perl interface. */
+    if (x->availablityDate)
+	setString(hv, "availablityDate", x->availablityDate);
+    if (x->availableThru)
+	setString(hv, "availableThru", x->availableThru);
+    if (x->restrictions)
+	setString(hv, "restrictions", x->restrictions);
+    if (x->itemId)
+	setString(hv, "itemId", x->itemId);
+    setNumber(hv, "renewable", *x->renewable);
+    setNumber(hv, "onHold", *x->onHold);
+    if (x->enumAndChron)
+	setString(hv, "enumAndChron", x->enumAndChron);
+    if (x->midspine)
+	setString(hv, "midspine", x->midspine);
+    if (x->temporaryLocation)
+	setString(hv, "temporaryLocation", x->temporaryLocation);
+
+    return sv;
+}
+
+
 /*
  * We use a blessed scalar string to represent the (non-ASN.1-encoded)
  * record; the only difficult part is knowing what class to bless it into.
@@ -541,7 +692,6 @@ static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 	{ VAL_HTML,		"Net::Z3950::Record::HTML" },
 	{ VAL_TEXT_XML,		"Net::Z3950::Record::XML" },
 	{ VAL_APPLICATION_XML,	"Net::Z3950::Record::XML" },
-	{ VAL_OPAC,		"Net::Z3950::Record::OPAC" },
 	{ VAL_MAB,              "Net::Z3950::Record::MAB" },
 	{ VAL_NOP }		/* end marker */
 	/* ### etc. */

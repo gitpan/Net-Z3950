@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.11 2003/06/26 22:20:17 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.12 2003/09/06 01:21:18 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -674,7 +674,7 @@ sub option {
 
 =head1 AUTHOR
 
-Mike Taylor E<lt>mike@tecc.co.ukE<gt>
+Mike Taylor E<lt>mike@indexdata.comE<gt>
 
 First version Sunday 28th May 2000.
 

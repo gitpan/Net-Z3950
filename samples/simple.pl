@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.9 2003/06/26 21:38:37 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.11 2003/09/12 22:02:57 mike Exp $
 
 use Net::Z3950;
 use strict;
@@ -23,7 +23,8 @@ my $conn = new Net::Z3950::Connection($mgr, $host, $port, databaseName => $db)
     or die "can't connect: $!";
 
 my $rs = $conn->search($query)
-    or die $conn->errmsg();
+    or die("search: " . $conn->errmsg(), 
+	   defined $conn->addinfo() ? ": " . $conn->addinfo() : "");
 
 my $n = $rs->size();
 print "found $n records:\n";
@@ -35,7 +36,7 @@ for (my $i = 0; $i < $n; $i++) {
 	    " (", $rs->errmsg(), "): ", $rs->addinfo(), "\n";
 	next;
     }
-    print "=== record ", $i+1, " ===\n", $rec->render();
+    print "=== record ", $i+1, " ===\n", $rec, "\n", $rec->render();
 }
 
 $rs->delete();			# may not be supported by all servers
