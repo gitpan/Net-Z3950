@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/util.c,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/util.c,v 1.2 2001/06/22 08:32:38 mike Exp $ */
 
 /*
  * yazwrap/util.c -- wrapper functions for Yaz's client API.
@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include "ywpriv.h"
 
 
@@ -38,7 +39,7 @@ int cs_look(COMSTACK cs)
 {
     int s = cs_fileno(cs);
     int err = 0;		/* initialise to avoid -Wall warning */
-    socklen_t errlen = sizeof err;
+    size_t errlen = sizeof err;
 
     if (getsockopt(s, SOL_SOCKET, SO_ERROR, (void*) &err, &errlen) < 0)
 	fatal("getsockopt() failed: error %d (%s)", errno, strerror(errno));
