@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.3 2002/07/19 15:44:16 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.4 2004/03/31 12:28:01 mike Exp $ */
 
 /*
  * yazwrap/connect.c -- wrapper functions for Yaz's client API.
@@ -25,14 +25,9 @@ COMSTACK yaz_connect(char *addr)
     COMSTACK conn;
     void *inaddr;
 
-    if ((conn = cs_create(tcpip_type, 0, PROTO_Z3950)) == 0) {
+    if ((conn = cs_create_host(addr, 0, &inaddr)) == 0) {
 	/* mostly likely `errno' will be ENOMEM or something useful */
         return 0;
-    }
-
-    if ((inaddr = cs_straddr(conn, addr)) == 0) {
-	/* ### How can we get more information to the caller? */
-	return 0;
     }
 
     switch (cs_connect(conn, inaddr)) {

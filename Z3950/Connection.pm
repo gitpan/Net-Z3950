@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.24 2003/11/21 12:05:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.25 2004/03/31 12:28:01 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -40,6 +40,9 @@ against result sets instantiated against it) I<etc.>
 =head2 new()
 
 	$conn = new Net::Z3950::Connection($mgr, $host, $port);
+	$conn = new Net::Z3950::Connection($host, $port);
+	$conn = new Net::Z3950::Connection($mgr, "unix", $path);
+	$conn = new Net::Z3950::Connection("unix", $path);
 
 Creates and returns a new connection, under the control of the manager
 I<$mgr>, to the server on the specified I<$host> and I<$port>.  If the
@@ -54,6 +57,9 @@ with no explicitly-specified manager in this way will all share the
 same implicit manager.  The default manager is initially in
 synchronous mode.  If you don't understand what this paragraph is on
 about, you should feel free to ignore it.
+
+Unix-domain socket connections can be made by specifying C<unix> as
+the hostname and the path to the socket file as the port.
 
 If the connection is created in synchronous mode, (or, if the
 constructor call doesn't specify a mode, if the manager controlling

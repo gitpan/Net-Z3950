@@ -1,6 +1,12 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.53 2004/03/17 14:13:06 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.54 2004/03/31 12:28:01 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.42  Wed Mar 31 13:06:09 2004
+	- Add support for Unix-domain sockets: use "unix" as the
+	  hostname, and the path to the socket file as the port, in
+	  the connection constructor.  Like this:
+		$conn = new Net::Z3950::Connection("unix", "/tmp/socket");
 
 0.41  Wed Mar 17 13:33:43 2004
 	- When Net::Z3950::Manager::wait() times out, it now returns
