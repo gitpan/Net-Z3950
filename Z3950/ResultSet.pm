@@ -99,6 +99,69 @@ sub size {
     return $this->{searchResponse}->resultCount();
 }
 
+=head2 present()
+
+    $rs->present($start, $count) or die "failed: $rs->{errcode}\n";
+
+Causes any records in the specified range that are not yet in the
+cache to be retrieved from the server.  By calling this method before
+retrieving individual records with C<record()>, you avoid sending lots
+of small requests for single records across the network.  In
+asynchronous mode, C<present()> just schedules the records for
+retrieval.
+
+Note that C<$start> is indexed from 1.
+
+Returns a boolean indicating whether the record(s) were successfully
+retrieved.
+
+=cut
+
+
+sub present {
+    my ($this, $start, $count) = @_;
+
+    my $esn = $this->option('elementSetName');
+    if (!defined $this->{records}->{$esn}) {
+	$this->{records}->{$esn} = [];
+    }
+    my $records = $this->{records}->{$esn};
+
+    # quietly ignore presents past the last record - this stops
+    # prefetch causing errors
+
+    my $size = $this->size;
+    my $last = $start+$count-1;
+    $last = $size if $last > $size;
+
+    my $seen_new;
+    for (my $i=$start; $i <= $last; $i++) {
+	if (not defined $records->[$i]) {
+	    # It hasn't even been requested: mark for Present-request
+	    $records->[$i] = CALLER_REQUESTED;
+	    $seen_new = 1;
+	}
+    }
+    $this->{conn}->{idleWatcher}->start() if $seen_new;
+
+    if ($this->option('mode') eq 'async') {
+	$this->{errcode} = 0;
+	return 1;
+    }
+
+    # Synchronous-mode request for a record that we don't yet have.
+    # As soon as we're idle -- in the wait() call -- the _idle()
+    # watcher will send a presentRequest; we then wait for its
+    # response to arrive.
+    if (!$this->{conn}->expect(Net::Z3950::Op::Get, "get")) {
+	# Error code and addinfo are in the connection: copy them across
+	$this->{errcode} = $this->{conn}->{errcode};
+	$this->{addinfo} = $this->{conn}->{addinfo};
+	return undef;
+    }
+    return 1;
+}
+
 
 =head2 record()
 
@@ -125,13 +188,27 @@ sub record {
     my $this = shift();
     my($which) = @_;
 
-    my $esn = $this->option('elementSetName');
-    if (!defined $this->{records}->{$esn}) {
-	#warn "setting [] for '$esn'";
-	$this->{records}->{$esn} = [];
+    # autovivifies if necessary
+    my $rec = $this->{records}{$this->option('elementSetName')}[$which];
+
+    if (!defined $rec or not ref $rec) {
+	# Record not in place yet
+
+	$this->present($which, $this->option('prefetch') || 1)
+	    or return undef;
+
+	if ($this->option('mode') eq 'async') {
+	    $this->{errcode} = 0;
+	    return undef;
+	}
+
+	$rec = $this->{records}{$this->option('elementSetName')}[$which];
+
+	# The _add_records() callback invoked by the event loop should now
+	# have inserted the requested record into our array, so we should
+	# just be able to return it.  Sanity-check first, though.
+	die "record(): impossible: didn't get record" if !defined $rec;
     }
-    my $records = $this->{records}->{$esn};
-    my $rec = $records->[$which];
 
     if (ref $rec && $rec->isa('Net::Z3950::APDU::DefaultDiagFormat')) {
 	# Set error information from record into the result set
@@ -139,39 +216,9 @@ sub record {
 	$this->{errcode} = $rec->condition();
 	$this->{addinfo} = $rec->addinfo();
 	return undef;
-    } elsif (ref $rec) {
-	# We have it, and it's presumably a legitmate record
-	return $rec;
     }
-
-    # Record is not yet in place
-    if (!defined $rec) {
-	# It hasn't even been requested: mark for Present-request
-	$records->[$which] = CALLER_REQUESTED;
-	$this->{conn}->{idleWatcher}->start();
-    }
-
-    if ($this->option('mode') eq 'async') {
-	$this->{errcode} = 0;
-	return undef;
-    }
-
-    # Synchronous-mode request for a record that we don't yet have.
-    # As soon as we're idle -- in the wait() call -- the _idle()
-    # watcher will send a presentRequest; we then wait for its
-    # response to arrive.
-    if (!$this->{conn}->expect(Net::Z3950::Op::Get, "get")) {
-	# Error code and addinfo are in the connection: copy them across
-	$this->{errcode} = $this->{conn}->{errcode};
-	$this->{addinfo} = $this->{conn}->{addinfo};
-	return undef;
-    }
-
-    # The _add_records() callback invoked by the event loop should now
-    # have inserted the requested record into out array, so we should
-    # just be able to return it.  Sanity-check first, though.
-    die "impossible: didn't get record" if !defined $records->[$which];
-    return $this->record(@_);
+    # We have it, and it's presumably a legitmate record
+    return $rec;
 }
 
 
@@ -457,7 +504,8 @@ the C<errcode()> and C<addinfo()> methods.
 
 B<Unwarranted personal opinion>: all in all, this method is a pleasant
 short-cut for trivial programs to use, but probably carries too many
-caveats to be used extensively in serious applications.
+caveats to be used extensively in serious applications. You may want to
+take a look at C<present()> and the C<prefetch> option instead.
 
 =cut
 

@@ -129,6 +129,10 @@ int
 yaz_socket(cs)
 	COMSTACK cs
 
+int
+yaz_close(cs)
+	COMSTACK cs
+
 const char *
 diagbib1_str(errcode)
 	int errcode

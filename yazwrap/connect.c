@@ -58,3 +58,10 @@ int yaz_socket(COMSTACK cs)
 {
     return cs_fileno(cs);
 }
+
+/* just a wrapper for now, but who knows - perhaps it may do more later */
+
+int yaz_close(COMSTACK cs)
+{
+    return cs_close(cs);
+}

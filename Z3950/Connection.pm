@@ -131,18 +131,17 @@ sub new {
 	or die "can't make IO::Handle out of file descriptor";
     $this->{sock} = $sock;
 
-    Event->io(fd => $sock, poll => 'r', data => $this, cb => \&_ready_to_read,
-	      debug => 5)
+    $this->{readWatcher}  = Event->io(fd => $sock, poll => 'r', data => $this,
+    				cb => \&_ready_to_read)
 	or die "can't make read-watcher on socket to $addr";
+
     $this->{writeWatcher} = Event->io(fd => $sock, poll => 'w', data => $this,
-				      parked => 1, cb => \&_ready_to_write,
-				      debug => 5)
+				      parked => 1, cb => \&_ready_to_write)
 	or die "can't make write-watcher on socket to $addr";
 
     # Arrange to have result-sets on this connection ask for extra records
     $this->{idleWatcher} = Event->idle(data => $this, repeat => 1, parked => 1,
-				       cb => \&Net::Z3950::ResultSet::_idle,
-				       debug => 5)
+				       cb => \&Net::Z3950::ResultSet::_idle)
 	or die "can't make idle-watcher on socket to $addr";
 
     # Generate the INIT request and queue it up for subsequent dispatch
@@ -191,6 +190,17 @@ sub _ready_to_read {
 				# parameter to decodeAPDU()
     my $apdu = Net::Z3950::decodeAPDU($conn->{cs}, $reason);
     if (defined $apdu) {
+
+	if ($apdu->isa('Net::Z3950::APDU::Close')) {
+	    # XXX this should be handled properly - we should send a
+	    # reply, then drop the connection. Is there any better way
+	    # to notify to user than just dying? Should userland code be
+	    # allowed to handle this? I don't know. DAPM.
+
+	    $watcher->cancel();
+	    die "[$addr] received close request: " . $apdu->as_text .  "\n";
+	}
+
 	my $refId = $conn->_dispatch($apdu);
 	if (!defined $refId) {
 	    # Unrecognised APDU -- nothing useful to do here, unless
@@ -210,8 +220,8 @@ sub _ready_to_read {
     }
 
     if ($reason == Net::Z3950::Reason::EOF) {
-	print "[$addr] EOF from server (server closed connection?)\n";
 	$watcher->cancel();
+	die "[$addr] EOF from server (server closed connection?)\n";
 
     } elsif ($reason == Net::Z3950::Reason::Incomplete) {
 	# Some bytes have been read into the COMSTACK (which maintains
@@ -220,20 +230,20 @@ sub _ready_to_read {
 	# wait until we get called again with the next chunk.
 
     } elsif ($reason == Net::Z3950::Reason::Malformed) {
-	print "[$addr] malformed APDU (server doesn't speak Z39.50?)\n";
 	$watcher->cancel();	
+	die "[$addr] malformed APDU (server doesn't speak Z39.50?)\n";
 
     } elsif ($reason == Net::Z3950::Reason::BadAPDU) {
-	print "[$addr] unrecognised APDU: never mind\n";
+	die "[$addr] unrecognised APDU: never mind\n";
 	# No need to shut down the connection: it's probably our fault.
 
     } elsif ($reason == Net::Z3950::Reason::Error) {
-	print "[$addr] system error ($!)\n";
 	$watcher->cancel();
+	die "[$addr] system error ($!)\n";
 
     } else {
 	# Should be impossible
-	print "decodeAPDU() failed for unknown reason: $reason\n";
+	die "decodeAPDU() failed for unknown reason: $reason\n";
     }
 }
 
@@ -257,7 +267,7 @@ sub _dispatch {
 	my $which = $apdu->referenceId();
 	defined $which or die "no reference Id in search response";
 	my $rs = $this->{resultSets}->[$which]
-	    and die "reference to exisiting result set";
+	    and die "reference to existing result set";
 	$rs = _new Net::Z3950::ResultSet($this, $which, $apdu);
 	$this->{resultSets}->[$which] = $rs;
 	$this->{resultSet} = $rs;
@@ -278,8 +288,7 @@ sub _dispatch {
 	return $apdu->referenceId();
 
     } else {
-	print "unsupported APDU [$apdu] ignored\n";
-	return undef;
+	die "unsupported APDU [$apdu] ignored\n";
     }
 }
 
@@ -292,27 +301,24 @@ sub _ready_to_write {
     my $addr = $conn->{host} . ":" . $conn->{port};
 
     if (!$conn->{queued}) {
-	print STDERR "Huh?  _ready_to_write() called with nothing queued\n";
-	return;
+	die "Huh?  _ready_to_write() called with nothing queued\n";
     }
 
     # We bung as much of the data down the socket as we can, and keep
     # hold of whatever's left.
     my $nwritten = Net::Z3950::yaz_write($conn->{cs}, $conn->{queued});
     if ($nwritten < 0 && $! == ECONNREFUSED) {
-	print "[$addr] connection refused\n";
 	$conn->_destroy();
 	Event::unloop(undef);
+	die "[$addr] connection refused\n";
     } elsif ($nwritten < 0) {
-	print "[$addr] yaz_write() failed ($!): closing connection\n";
 	$watcher->cancel();
-	return;
+	die "[$addr] yaz_write() failed ($!): closing connection\n";
     }
 
     if ($nwritten == 0) {
 	# Should be impossible: we only get called when ready to write
-	print "[$addr] write zero bytes (shouldn't happen): never mind\n";
-	return;
+	die "[$addr] write zero bytes (shouldn't happen): never mind\n";
     }
 
     $conn->{queued} = substr($conn->{queued}, $nwritten);
@@ -753,7 +759,8 @@ sub close {
 
     my $mgr = delete $this->{mgr};
     $mgr->forget($this);
-    ### How can we check if our refcount is zero now?
+
+    $this->DESTROY();
 }
 
 
@@ -761,6 +768,26 @@ sub DESTROY {
     my $this = shift();
 
     #warn "destroying Net::Z3950 Connection $this";
+
+    $this->{idleWatcher }->cancel() if defined $this->{idleWatcher};
+    $this->{readWatcher }->cancel() if defined $this->{readWatcher};
+    $this->{writeWatcher}->cancel() if defined $this->{writeWatcher};
+
+    # XXX for a V.3 connection, we should really send a closeRequest
+    # and await a closeResponse, but thats a lot of extra coding effort
+    # for very little gain. A server that can't cope with an
+    # abrupty-severed connection isn't going to last for long in the real
+    # world....
+
+    if (defined $this->{cs}) {
+	Net::Z3950::yaz_close($this->{cs});
+    }
+
+    # lots of the elements of %$this directly or indirectly contain
+    # copies of $this. By deleting all elements from the hash, we hope
+    # to break all circular references.
+
+    %$this = ();
 }
 
 

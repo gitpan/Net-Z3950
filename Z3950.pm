@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.29';
+$VERSION = '0.30';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -49,11 +49,19 @@ Net::Z3950 - Perl extension for talking to Z39.50 servers.
 which allows multiple servers to be searched in parallel.)
 
 	use Net::Z3950;
-	$conn = new Net::Z3950::Connection('server.host.name', 210);
-	$rs = $conn->search('au=kernighan or su=unix');
-	foreach $rec ($rs->records()) {
-		print $rec->render();
+
+	$conn = new Net::Z3950::Connection('server.host.name', 210)
+	    or die $!;
+	$rs = $conn->search('au=kernighan or su=unix')
+	    or die $conn->errmsg();
+
+	foreach $i (1..$rs->size()) {
+	    $rec = $rs->record($i)
+		or die $rs->errmsg();
+	    print $rec->render();
 	}
+
+	$conn->close();
 
 =head1 DESCRIPTION
 

@@ -34,5 +34,9 @@ libyazwrap$(LIB_EXT): $(O_FILES)
 	$(AR) cr libyazwrap$(LIB_EXT) $(O_FILES)
 	$(RANLIB) libyazwrap$(LIB_EXT)
 
+# nothing to test
+
+test:
+
 ';
 }

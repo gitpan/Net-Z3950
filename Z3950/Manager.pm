@@ -216,7 +216,6 @@ sub wait {
     my $handler = $this->option('die_handler');
     $Event::DIED = defined $handler ? $handler :
 	\&Event::verbose_exception_handler;
-    $Event::DIED = \&Event::verbose_exception_handler;
 
     my $conn = Event::loop();
     return $conn;
@@ -278,7 +277,7 @@ sub forget {
     my $n = $this->connections();
     for (my $i = 0; $i < $n; $i++) {
 	next if $this->{connections}->[$i] ne $conn;
-	warn "forgetting connection $i of $n";
+	# warn "forgetting connection $i of $n";
 	splice @{ $this->{connections} }, $i, 1;
 	return;
     }

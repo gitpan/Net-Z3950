@@ -2,6 +2,32 @@ $Header: /home/cvsroot/NetZ3950/Changes,v 1.19 2002/02/27 17:28:54 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
 
+0.30  Fri Jul 19 13:55:45 2002
+	Today's release is brought to you entirely by Dave Mitchell
+	<davem@fdgroup.com>, who has done an astonishing amount of
+	really useful work on Net::Z3950.  Thanks, Dave!
+
+	- Added the present() method and "prefetch" option to optimise
+	  multiple calls of record() in synchronous mode.
+	- Made $conn->close() actually clean up and close the connection
+	- Fixed memory leak in receive.c, decodeAPDU()
+	- Added functions to decode close request/response APDUs.
+	- Really do add ability to set custom exception-handler via
+	  "die_handler" option -- I [Mike] did it wrong last time.
+	- Changed all print()s to die()s, which can be caught as
+	  exceptions.
+	- Commented out a debugging warn()
+	- Added a dummy "test" target to yazwrap/Makefile.PL to stop
+	  it complaining during "make test" [At last! -- Mike]
+	- Removed "debug => 5" from watcher creators.
+	- Updated the synchronous synopsis:
+	  * Replaced use of records() with record(), since the former
+	    is deprecated.
+	  * Added error-checking, so that people who cut-and-paste the
+	    synposis start off with good habits.
+	  * Added $conn->close(), so people know this doesn't happen
+	    automatically.
+
 0.29  Fri May 17 17:07:53 2002
 	- Add ability to set custom exception-handler via
 	  'die_handler' option.

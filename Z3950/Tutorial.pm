@@ -259,6 +259,35 @@ which database is to be searched.
 
 =head2 Retrieval
 
+By default, records are requested from the server one at a time;
+this can be quite slow when retrieving several records. There are two
+ways of improving this. First, the C<present()> method can be used to
+explicitly precharge the cache. Its parameters are a start record and
+record count. In the following example, the present() is optional and
+merely makes the code run faster:
+
+	$rs->present(11, 5) or die ".....";
+	foreach my $i (11..15) {
+	    my $rec = $rs->record($i);
+	    ...
+	}
+
+The second way is with the C<prefetch> option. Setting this to a 
+positive integer makes the C<record()> method fetch the next N
+records and place them in the cache if the the current record
+isn't already there. So the following code would cause two bouts of
+network activity, each retrieving 10 records.
+
+	$rs->option(prefetch => 10);
+	foreach my $i (1..20) {
+	    my $rec = $rs->record($i);
+	    ...
+	}
+
+In asynchronous mode, C<present()> and C<prefetch> merely cause the
+records to be scheduled for retrieval.
+
+
 B<Element Set>
 
 The default element set is ``b'' (brief).  To change this, set the

@@ -141,6 +141,54 @@ use vars qw(@ISA @FIELDS);
 sub _fields { @FIELDS };
 
 
+=head2 Net::Z3950::APDU::Close
+
+	referenceId()
+	closeReason()
+	diagnosticInformation()
+
+	as_text()	(render fields as printable string)
+
+=cut
+
+package Net::Z3950::Close;
+sub Finished		{ 0 }
+sub Shutdown		{ 1 }
+sub SystemProblem	{ 2 }
+sub CostLimit		{ 3 }
+sub Resources		{ 4 }
+sub SecurityViolation	{ 5 }
+sub ProtocolError	{ 6 }
+sub LackOfActivity	{ 7 }
+sub PeerAbort		{ 8 }
+sub Unspecified		{ 9 }
+
+package Net::Z3950::APDU::Close;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(closeReason diagnosticInformation referenceId);
+sub _fields { @FIELDS };
+
+# render the info as a printable string
+
+sub as_text {
+    my $this = shift;
+    my $text = (
+	    qw( Finished Shutdown SystemProblem CostLimit
+	    Resources SecurityViolation ProtocolError
+	    LackOfActivity PeerAbort Unspecified )
+	)[$this->{closeReason}] || '**Unknown**';
+    $text .= " ($this->{diagnosticInformation})"
+    				if defined $this->{diagnosticInformation};
+    $text .= " refid[$this->{referenceId}]"
+    				if defined $this->{referenceId};
+
+    $text;
+}
+
+
+
+
 =head2 Net::Z3950::APDU::NamePlusRecordList
 
 No methods - just treat as a reference to an array of

@@ -20,6 +20,7 @@ typedef char mnchar;
 
 /* Home-brew simplified front end functions */
 COMSTACK yaz_connect(char *addr);
+int yaz_close(COMSTACK cs);
 int yaz_socket(COMSTACK cs);
 
 /*

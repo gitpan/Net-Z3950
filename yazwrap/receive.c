@@ -18,6 +18,7 @@ static SV *translateAPDU(Z_APDU *apdu, int *reasonp);
 static SV *translateInitResponse(Z_InitResponse *res, int *reasonp);
 static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp);
 static SV *translatePresentResponse(Z_PresentResponse *res, int *reasonp);
+static SV *translateClose(Z_Close *res, int *reasonp);
 static SV *translateRecords(Z_Records *x);
 static SV *translateNamePlusRecordList(Z_NamePlusRecordList *x);
 static SV *translateNamePlusRecord(Z_NamePlusRecord *x);
@@ -57,7 +58,7 @@ SV *decodeAPDU(COMSTACK cs, int *reasonp)
     static char *buf = 0;	/* apparently, static is OK */
     static int size = 0;	/* apparently, static is OK */
     int nbytes;
-    ODR odr;
+    static ODR odr = 0;
     Z_APDU *apdu;
 
     switch (cs_look(cs)) {
@@ -90,16 +91,19 @@ SV *decodeAPDU(COMSTACK cs, int *reasonp)
 	break;
     }
 
-    if ((odr = odr_createmem(ODR_DECODE)) == 0) {
-	/* Perusal of the Yaz source shows that this is impossible:
-	 * odr_createmem() only fails if the initial xmalloc() fails,
-	 * but xmalloc() is #defined to xmalloc_f(), which goes fatal
-	 * if the underlying xmalloc_d() call fails.
-	 */
-	fatal("impossible odr_createmem() failure");
+    if (odr)
+	odr_reset(odr);
+    else {
+	if ((odr = odr_createmem(ODR_DECODE)) == 0) {
+	    /* Perusal of the Yaz source shows that this is impossible:
+	     * odr_createmem() only fails if the initial xmalloc() fails,
+	     * but xmalloc() is #defined to xmalloc_f(), which goes fatal
+	     * if the underlying xmalloc_d() call fails.
+	     */
+	    fatal("impossible odr_createmem() failure");
+	}
     }
 
-    odr_reset(odr);		/* do we need to do this on a new ODR? */
     odr_setbuf(odr, buf, nbytes, 0);
     if (!z_APDU(odr, &apdu, 0, 0)) {
 	/* Oops.  Malformed APDU (can't be short, otherwise, we'd not
@@ -151,6 +155,8 @@ static SV *translateAPDU(Z_APDU *apdu, int *reasonp)
 	return translateSearchResponse(apdu->u.searchResponse, reasonp);
     case Z_APDU_presentResponse:
 	return translatePresentResponse(apdu->u.presentResponse, reasonp);
+    case Z_APDU_close:
+	return translateClose(apdu->u.close, reasonp);
     default:
 	break;
     }
@@ -214,6 +220,28 @@ static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp)
     /* additionalSearchInfo (OPT) not translated (complex data type) */
     /* otherInfo (OPT) not translated (complex data type) */
 
+    return sv;
+}
+
+static SV *translateClose(Z_Close *res, int *reasonp)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::Close", (SV*) (hv = newHV()));
+
+    if (res->referenceId)
+	setBuffer(hv, "referenceId",
+		  (char*) res->referenceId->buf, res->referenceId->len);
+
+    setNumber(hv, "closeReason", (IV) *res->closeReason);
+
+    if (res->diagnosticInformation)
+	setString(hv, "diagnosticInformation", (char*) res->referenceId);
+
+    /* resourceReportFormat (OPT) not translated */
+    /* resourceReport       (OPT) not translated */
+    /* otherInfo	    (OPT) not translated */
     return sv;
 }
 
