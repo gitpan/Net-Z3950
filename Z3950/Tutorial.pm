@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.14 2004/05/07 15:40:19 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.15 2004/11/01 09:12:52 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -540,6 +540,15 @@ By default, all three options are undefined, so no authentication is
 used.
 
 
+B<Character set and language negotiation>
+
+The C<charset> and C<language> options can be used to negotiate the
+character set and language to be used for connections opened through
+that manager.  If these options are set, they are passed to the server
+in a character-negotition otherInfo package attached to the
+initialisation request.
+
+
 =head1 OPTION INHERITANCE
 
 The values of options are inherited from managers to connections,
@@ -624,6 +633,14 @@ C<'Net::Z3950.pm (Perl)'>
 =item C<implementationVersion>
 
 C<$Net::Z3950::VERSION>
+
+=item C<charset>
+
+C<undef>
+
+=item C<language>
+
+C<undef>
 
 =item C<querytype>
 

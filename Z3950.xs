@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.5 2004/04/28 12:20:00 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.6 2004/11/01 08:31:43 adam Exp $ */
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -138,7 +138,7 @@ diagbib1_str(errcode)
 	int errcode
 
 databuf
-makeInitRequest(referenceId, preferredMessageSize, maximumRecordSize, user, password, groupid, implementationId, implementationName, implementationVersion, errmsg)
+makeInitRequest(referenceId, preferredMessageSize, maximumRecordSize, user, password, groupid, implementationId, implementationName, implementationVersion, charset, language, errmsg)
 	databuf referenceId
 	int preferredMessageSize
 	int maximumRecordSize
@@ -148,6 +148,8 @@ makeInitRequest(referenceId, preferredMessageSize, maximumRecordSize, user, pass
 	mnchar *implementationId
 	mnchar *implementationName
 	mnchar *implementationVersion
+	mnchar *charset
+	mnchar *language
 	char *&errmsg
 	OUTPUT:
 	errmsg

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.8 2004/04/28 12:22:50 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.9 2004/11/01 08:31:44 adam Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -15,6 +15,8 @@
 #include <yaz/pquery.h>		/* prefix query compiler */
 #include <yaz/ccl.h>		/* CCL query compiler */
 #include <yaz/yaz-ccl.h>	/* CCL-to-RPN query converter */
+#include <yaz/otherinfo.h>
+#include <yaz/charneg.h>
 #include "ywpriv.h"
 
 
@@ -39,6 +41,8 @@ databuf makeInitRequest(databuf referenceId,
 			mnchar *implementationId,
 			mnchar *implementationName,
 			mnchar *implementationVersion,
+			mnchar *charset,
+			mnchar *language,
 			char **errmsgp)
 {
     static ODR odr = 0;
@@ -98,6 +102,26 @@ databuf makeInitRequest(databuf referenceId,
 	    id.password = password;
 	}
     }
+
+    if (charset || language) {
+        Z_OtherInformation **p;
+        Z_OtherInformationUnit *p0;
+
+        yaz_oi_APDU(apdu, &p);
+         
+        if ((p0=yaz_oi_update(p, odr, NULL, 0, 0))) {
+            ODR_MASK_SET(req->options, Z_Options_negotiationModel);
+             
+            p0->which = Z_OtherInfo_externallyDefinedInfo;
+            p0->information.externallyDefinedInfo =
+                yaz_set_proposal_charneg(
+                    odr,
+                    (const char**)&charset,
+                    charset ? 1 : 0,
+                    (const char**)&language, language ? 1 : 0, 1);
+        }
+    }
+     
 
     if (implementationId != 0)
 	req->implementationId = implementationId;

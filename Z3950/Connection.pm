@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.30 2004/05/07 16:59:21 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.31 2004/11/01 08:31:43 adam Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -179,6 +179,8 @@ sub new {
 				    $this->option('implementationId'),
 				    $this->option('implementationName'),
 				    $this->option('implementationVersion'),
+				    $this->option('charset'),
+				    $this->option('language'),
 				    $errmsg);
     die "can't make init request: $errmsg" if !defined $ir;
 

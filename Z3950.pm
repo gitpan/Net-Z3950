@@ -1,4 +1,4 @@
-# $Id: Z3950.pm,v 1.37 2004/05/07 16:59:46 mike Exp $
+# $Id: Z3950.pm,v 1.39 2004/11/01 09:15:07 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.44';
+$VERSION = '0.45';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -286,7 +286,8 @@ the Z39.50 BIB-1 diagnostic error code I<$errcode>.
 sub errstr {
     my($errcode) = @_;
 
-    die "errstr() called with undefined argument" if !defined $errcode;
+    use Carp;
+    confess "errstr() called with undefined argument" if !defined $errcode;
     return "not yet available (try again later)" if $errcode == 0;
     return diagbib1_str($errcode);
 }

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.5 2004/04/28 12:13:08 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.6 2004/11/01 08:31:44 adam Exp $ */
 
 /*
  * yazwrap/yazwrap.h -- wrapper functions for Yaz's client API.
@@ -39,6 +39,8 @@ databuf makeInitRequest(databuf referenceId,
 			mnchar *implementationId,
 			mnchar *implementationName,
 			mnchar *implementationVersion,
+			mnchar *charset,
+			mnchar *language,
 			/* userInformationField */
 			/* otherInfo */
 			char **errmsgp

@@ -1,4 +1,4 @@
-# $Id: Manager.pm,v 1.24 2004/05/07 15:40:47 mike Exp $
+# $Id: Manager.pm,v 1.25 2004/11/01 09:12:23 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -157,6 +157,8 @@ sub _default {
     return 'Mike Taylor (id=169)' if $type eq 'implementationId';
     return 'Net::Z3950.pm (Perl)' if $type eq 'implementationName';
     return $Net::Z3950::VERSION if $type eq 'implementationVersion';
+    return undef if $type eq 'charset';
+    return undef if $type eq 'language';
 
     # Used in Net::Z3950::Connection::startSearch()
     return 'prefix' if $type eq 'querytype';
