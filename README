@@ -1,4 +1,4 @@
-$Header: /home/cvsroot/perlZ3950/README,v 1.2 2000/06/29 16:01:34 mike Exp $
+$Header: /home/cvsroot/NetZ3950/README,v 1.3 2001/02/21 16:49:16 mike Exp $
 
 Net::Z3950.pm -- What Is It?
 ----------------------------
@@ -9,11 +9,15 @@ used in application domains as diverse as bibliographic information,
 geo-spatial mapping, museums and other cultural heritage information,
 and structured vocabulary navigation.
 
+Up to date information on this module can be found at
+http://www.miketaylor.org.uk/tech/nz/index.html
+
 
 Building and Installation
 -------------------------
 
-There are two prerequisites to building the Net::Z3950 module:
+There are two (or three, depending on how you count them)
+prerequisites to building the Net::Z3950 module:
 
     1.	You'll need the Event module (a generic event loop).  I've
 	tested only with version 0.77 of Event, but later versions
@@ -33,12 +37,33 @@ There are two prerequisites to building the Net::Z3950 module:
 	to modify the LIBS and INC settings in ./Makefile.PL and the
 	INC setting in yazwrap/Makefile.PL.
 
-Apart from that, you know the drill:
+    3.	The third dependency is an optional one, on the MARC module.
+	This is required by the Net::Z3950::Record::MARC class's
+	render() method, but if you're not going to call that, you
+	don't need the MARC module, so it's not listed as a
+	prerequisite in the Makefile.PL.
+
+After installing any prerequisites, you know the drill:
 
 	perl Makefile.PL
 	make
 	make test
 	make install
+
+The only wrinkle in this procedure is that the "make test" stage
+finishes by complaining as follows:
+
+	make[1]: Entering directory `.../NetZ3950/yazwrap'
+	make[1]: *** No rule to make target `pure_all', needed by `test_dynamic'.  Stop.
+	make[1]: Leaving directory `.../NetZ3950/yazwrap'
+	make: *** [test] Error 2
+
+You can ignore this: it's not a problem at all.  Just go head and do
+the "make install" bit.  I should of course fix the build procedure so
+that "make test" doesn't try to run in the "yazwrap" directory, but
+I'm having an insanely difficult time conveying this seemingly trivial
+instruction to the totalitarial monolith that is ExtUtils::MakeMaker.
+help appreciated!
 
 
 Now What?
@@ -49,14 +74,30 @@ subdirectory.  Run "make" there to regenerate the HTML versions of the
 POD documents, and start reading at doc/index.html.
 
 
+Support
+-------
+
+Informal support is available directly from the author (see below) but
+there are of course no guarantees!  In general a better option is to
+join the Net::Z3950 mailing list, and discuss in that forum any
+problems you may encounter.  I read this list, so I will see your
+messages.  Its home page (with subscription instructions) is at
+http://www.indexdata.dk/mailman/listinfo/net-z3950
+
+For those who require it, it's possible to buy professional,
+commercial support for this module -- with well-defined support levels
+and response times -- from Index Data, in collaboration with whom I
+wrote this module. For details, email them on <info@indexdata.dk>
+
+
 Author
 ------
 
-Mike Taylor <mike@tecc.co.uk>
-http://www.staff.tecc.co.uk/mike/
+Mike Taylor <mirk@mail.com>
+http://miketaylor.tecc.co.uk/
 
 With lots of help, encouragement, design input, etc. from
 
 Sebastian Hammer <quinn@indexdata.dk> and
 Adam Dickmeiss <adam@indexdata.dk>
-http://indexdata.dk
+http://indexdata.dk/

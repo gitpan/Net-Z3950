@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/perlZ3950/samples/multiplex.pl,v 1.2 2000/06/29 16:01:34 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/multiplex.pl,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $
 
 ### this does not work with the current version of the library
 

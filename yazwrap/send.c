@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/perlZ3950/yazwrap/send.c,v 1.2 2000/06/29 16:01:34 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.2 2001/02/16 16:51:06 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -22,7 +22,7 @@ Z_ReferenceId *make_ref_id(Z_ReferenceId *buf, databuf refId);
 static Odr_oid *record_syntax(ODR odr, int preferredRecordSyntax);
 static databuf encode_apdu(ODR odr, Z_APDU *apdu);
 static void prepare_odr(ODR *odrp);
-static databuf nodata(void);
+static databuf nodata(char *debug);
 
 
 /*
@@ -114,7 +114,7 @@ databuf makeInitRequest(databuf referenceId,
  * I feel really uncomfortable about that fact that if this function
  * fails, the caller has no way to know why -- it could be an illegal
  * record syntax, an unsupported query type, a bad search command or
- failure to encode the APDU.  Oh well.
+ * failure to encode the APDU.  Oh well.
  */
 databuf makeSearchRequest(databuf referenceId,
 			  int smallSetUpperBound,
@@ -165,7 +165,7 @@ databuf makeSearchRequest(databuf referenceId,
     /* Convert from our enumeration to the corresponding OID */
     if ((req->preferredRecordSyntax =
 	 record_syntax(odr, preferredRecordSyntax)) == 0)
-	return nodata();
+	return nodata("can't convert record syntax");
 
     /* Convert from our querytype/query pair to a Z_Query */
     req->query = &zquery;
@@ -175,7 +175,7 @@ databuf makeSearchRequest(databuf referenceId,
 	/* ### Is type-1 always right?  What about type-101 when under v2? */
         zquery.which = Z_Query_type_1;
         if ((zquery.u.type_1 = p_query_rpn (odr, PROTO_Z3950, query)) == 0)
-	    return nodata();
+	    return nodata("can't compile PQN query");
         break;
 
     case QUERYTYPE_CCL:
@@ -188,9 +188,9 @@ databuf makeSearchRequest(databuf referenceId,
     case QUERYTYPE_CCL2RPN:
         zquery.which = Z_Query_type_1;
         if ((rpn = ccl_find_str((CCL_bibset) 0, query, &error, &pos)) == 0)
-	    return nodata();
+	    return nodata("can't compile CCL query");
         if ((zquery.u.type_1 = ccl_rpn_query(odr, rpn)) == 0)
-	    return nodata();
+	    return nodata("can't encode Type-1 query");
         attrset.proto = PROTO_Z3950;
         attrset.oclass = CLASS_ATTSET;
         attrset.value = VAL_BIB1; /* ### should be configurable! */
@@ -199,7 +199,7 @@ databuf makeSearchRequest(databuf referenceId,
         break;
 
     default:
-	return nodata();
+	return nodata("unknown queryType");
     }
 
     return encode_apdu(odr, apdu);
@@ -236,7 +236,7 @@ databuf makePresentRequest(databuf referenceId,
     esname.u.generic = elementSetName;
     if ((req->preferredRecordSyntax =
 	 record_syntax(odr, preferredRecordSyntax)) == 0)
-	return nodata();
+	return nodata("can't convert record syntax");
 
     return encode_apdu(odr, apdu);
 }
@@ -313,10 +313,15 @@ static void prepare_odr(ODR *odrp)
 
 /*
  * Return a databuf with a null pointer (used as an error indicator)
+ * (In passing, we also report to stderr what the problem was.)
  */
-static databuf nodata(void)
+static databuf nodata(char *debug)
 {
     databuf buf;
+
+#ifndef NDEBUG
+    fprintf(stderr, "nodata(): %s\n", debug);
+#endif
     buf.data = 0;
     return buf;
 }

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/perlZ3950/Z3950/Record.pm,v 1.2 2000/10/06 10:01:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.2 2001/02/16 16:51:06 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -221,9 +221,19 @@ sub nfields {
 				# software.
 }
 
+# Thanks to Dave Burgess <burgess@mitre.org> for supplying this code.
+# We pull in the MARC module with "require" rather than "use" so that
+# there's no dependency for non-MARC clients.
+#
 sub render {
     my $this = shift();
-    return "[human-rendering of MARC records not yet supported]";
+
+    require MARC;
+    my $inc = MARC::Rec->new();
+    my($rec, $status) = $inc->nextrec($this->rawdata());
+    return "[can't translate MARC record]"
+	if !$status;
+    return $rec->output({ format => 'ascii' });
 }
 
 sub rawdata {

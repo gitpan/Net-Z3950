@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/perlZ3950/yazwrap/ywpriv.h,v 1.3 2000/10/06 10:01:03 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/ywpriv.h,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $ */
 
 #include "EXTERN.h"		/* Prerequisite for "perl.h" */
 #define yaz_log __some_stupid_function_in_the_linux_math_library

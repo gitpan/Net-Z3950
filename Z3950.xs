@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/perlZ3950/Z3950.xs,v 1.2 2000/06/29 16:01:34 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.1.1.1 2001/02/12 10:53:54 mike Exp $ */
 
 #include "EXTERN.h"
 #include "perl.h"

@@ -1,4 +1,4 @@
-# $Header$
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.2 2001/02/16 16:51:06 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -288,6 +288,7 @@ C<Net::Z3950::RecordSyntax::USMARC>.
 (As always, C<option()> may also be invoked with no ``value''
 parameter to return the current value of the option.)
 
+
 =head1 WHAT TO DO WITH YOUR RECORDS
 
 Once you've retrieved a record, what can you do with it?
@@ -311,9 +312,6 @@ syntax can be determined using the universal C<isa()> method:
 For further manipulation of MARC records, we recommend the existing
 MARC module in Ed Summers's directory at CPAN,
 http://cpan.valueclick.com/authors/id/E/ES/ESUMMERS/
-(B<Note:> I personally don't use MARC records, but if someone who does
-would like to send me a small-but-complete worked example, I will
-gladly include it at this point.)
 
 The raw data of GRS-1 records in the C<Net::Z3950> module closely
 follows the structure of physcial GRS-1 records - see Appendices REC.5
@@ -351,7 +349,11 @@ C<Net::Z3950::Record::GRS1>, enabling arbitrary recursive nesting.
 
 =back
 
-### data module.
+In the future, we plan to take you away from all this by introducing a
+C<Net::Z3950::Data> module which provides a DOM-like interface for
+walking hierarchically structured records independently of their
+record syntax.  Keep watchin', kids!
+
 
 =head1 CHANGING SESSION PARAMETERS
 
@@ -463,6 +465,7 @@ value of C<group> if is it specified.
 
 By default, all three options are undefined, so no authentication is
 used.
+
 
 =head1 OPTION INHERITANCE
 
@@ -587,6 +590,7 @@ C<'b'>
 
 Any other option's value is undefined.
 
+
 =head1 ASYNCHRONOUS MODE
 
 I don't propose to discuss this at the moment, since I think it's
@@ -596,7 +600,8 @@ honest.
 
 B<### Note to self - write this section!>
 
-=head1 WHAT NOW?
+
+=head1 NOW WHAT?
 
 This tutorial is only an overview of what can be done with the
 C<Net::Z3950> module.  If you need more information that it provides,
@@ -607,6 +612,7 @@ C<Net::Z3950::Manager>,
 C<Net::Z3950::Connection>,
 C<Net::Z3950::ResultSet> and
 C<Net::Z3950::Record>.
+
 
 =head1 AUTHOR
 

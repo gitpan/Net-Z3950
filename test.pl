@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/perlZ3950/test.pl,v 1.4 2000/10/06 10:01:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.1.1.1 2001/02/12 10:53:54 mike Exp $
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/perlZ3950/samples/simple.pl,v 1.4 2000/10/06 10:01:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $
 
 use Net::Z3950;
 

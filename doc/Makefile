@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/perlZ3950/doc/Makefile,v 1.3 2000/10/06 10:01:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/doc/Makefile,v 1.1.1.1 2001/02/12 10:53:54 mike Exp $
 
 MODULES = Z3950 Z3950/Tutorial Z3950/Manager Z3950/Connection Z3950/APDU \
 	Z3950/ResultSet Z3950/Record

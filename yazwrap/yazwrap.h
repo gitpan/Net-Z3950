@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/perlZ3950/yazwrap/yazwrap.h,v 1.2 2000/06/29 16:01:34 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $ */
 
 /*
  * yazwrap/yazwrap.h -- wrapper functions for Yaz's client API.

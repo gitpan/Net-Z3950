@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/perlZ3950/Z3950/Manager.pm,v 1.2 2000/10/06 10:01:03 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
