@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.2 2002/01/22 14:51:01 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.7 2002/10/08 16:18:12 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -141,12 +141,15 @@ sub _default {
     return 0 if $type eq 'smallSetUpperBound';
     return 1 if $type eq 'largeSetLowerBound';
     return 0 if $type eq 'mediumSetPresentNumber';
-    return 'f' if $type eq 'smallSetElementSetName';
-    return 'b' if $type eq 'mediumSetElementSetName';
+    return 'F' if $type eq 'smallSetElementSetName';
+    return 'B' if $type eq 'mediumSetElementSetName';
     return Net::Z3950::RecordSyntax::GRS1 if $type eq 'preferredRecordSyntax';
 
     # Used in Net::Z3950::ResultSet::makePresentRequest()
-    return 'b' if $type eq 'elementSetName';
+    return 'B' if $type eq 'elementSetName';
+
+    # Assume the server's not brain-dead unless we're told otherwise
+    return 1 if $type eq 'namedResultSets';
 
     # etc.
 

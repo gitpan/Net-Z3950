@@ -1,6 +1,41 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.19 2002/02/27 17:28:54 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.27 2002/11/27 12:41:54 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.31  Wed Nov 27 12:40:50 2002
+	- Add command-line options to samples/simple.pl
+	- Add samples/canonical.pl
+	- Change the default element-set names in Manager.pm to be
+	  upper-case "F" and "B" rather than "f" and "b", as specified
+	  in section 3.6.2 (Composition Specification, Comp-spec
+	  Omitted) of the standard.
+		http://lcweb.loc.gov/z3950/agency/markup/08.html#3.6.2
+	  Even though a clarification makes it clear that element-set
+	  names should be treated case-insensitively.
+		http://lcweb.loc.gov/z3950/agency/clarify/esncase.html
+	- Formally deprecate the non-working records() method of the
+	  ResultSet class.
+	- When a new Connection object can't be made because of Init
+	  being refused (rather than due to a lower-level error such
+	  as ECONNREFUSED), $! is set to the distinguished value -1.
+		(Dave Mitchell)
+	- Neater code for connection-closing.
+		(Dave Mitchell)
+	- Fake up a diagnostic record (BIB-1 error 3, "unsupported
+	  search") for servers which illegally fail to include
+	  diagnostic records in the result of a failed search.
+		(Dave Mitchell)
+	- Added #include "XSUB.h" to the yazwrap directory's private
+	  code, which means it now does The Right Thing when compiling
+	  against a Perl build with the MULTIPLICITY flag set.  This
+	  means that we now build and run under cygwin on Windows 2000
+		(Dave Mitchell)
+	- Add new option "namedResultSets", initially true, which if
+	  set false caters for brain-damaged servers by always using
+	  the same result-set name, "default", thereby invalidating
+	  previous ResultSet objects.
+		(Dave Mitchell)
+	- Documentation tweaks.
 
 0.30  Fri Jul 19 13:55:45 2002
 	Today's release is brought to you entirely by Dave Mitchell
@@ -213,7 +248,6 @@ Revision history for Perl extension Net::Z3950.
 
 To be done:
 	- ### Fix test.pl to work against either local or remote server.
-	- ### Add close() method for connections.
 	- ### Make managers drop references to closed connections.
 	- ### Make $mgr->wait() finish when there are no connections left.
 	- ### Add optional timeout parameter to $mgr->wait()

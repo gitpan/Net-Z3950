@@ -21,6 +21,7 @@ doc/style.css
 doc/todo.html
 doc/visit.html
 samples/README
+samples/canonical.pl
 samples/fetch1.pl
 samples/multiplex.pl
 samples/simple.pl

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.2 2002/01/29 10:34:15 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.3 2002/07/19 15:44:16 mike Exp $ */
 
 /*
  * yazwrap/connect.c -- wrapper functions for Yaz's client API.

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.3 2001/11/01 17:02:58 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.9 2002/10/08 16:18:12 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -59,13 +59,20 @@ sub _new {
 
     if (!$searchResponse->searchStatus()) {
 	# Search failed: set $conn's error indicators and return undef
-	my $records = $searchResponse->records()
-	    or die "no diagnostics (I don't think that's legal)";
-	ref $records eq 'Net::Z3950::APDU::DefaultDiagFormat'
-	    or die "non-default diagnostic format";
-	### $rec->diagnosticSetId() is not used
-	$conn->{errcode} = $records->condition();
-	$conn->{addinfo} = $records->addinfo();
+	my $records = $searchResponse->records();
+
+	if (defined $records) {
+	    ref $records eq 'Net::Z3950::APDU::DefaultDiagFormat'
+		or die "non-default diagnostic format";
+	    ### $rec->diagnosticSetId() is not used
+	    $conn->{errcode} = $records->condition();
+	    $conn->{addinfo} = $records->addinfo();
+	} else {
+	    # Some servers don't return diag records, even though
+	    # that's illegal.  So fake an error.
+	    $conn->{errcode} = 3; # unsupported search -- near enough
+	    $conn->{addinfo} = "no diagnostic records supplied by server";
+	}
 	return undef;
     }
 
@@ -299,7 +306,8 @@ sub _send_presentRequest {
     my $refId = _bind_refId($this->{rsName}, $first, $howmany);
     my $errmsg = '';
     my $pr = Net::Z3950::makePresentRequest($refId,
-				       $this->{rsName},
+				       $this->option('namedResultSets') ?
+					$this->{rsName} : 'default',
 				       $first, $howmany,
 				       $this->option('elementSetName'),
 				       $this->option('preferredRecordSyntax'),
@@ -381,7 +389,7 @@ sub _insert_records {
 	# we're now miles away from any notional "flow of control"
 	# where we could pop up with an error.  Instead, we lodge a
 	# copy of this error in the slots for each record requested,
-	# so that when the caller invokes records(), we can arrange
+	# so that when the caller invokes record(), we can arrange
 	# that we set appropriate error information.
 	for (my $i = 0; $i < $howmany; $i++) {
 	    $records->[$first+$i] = $rawrecs;
@@ -507,6 +515,9 @@ short-cut for trivial programs to use, but probably carries too many
 caveats to be used extensively in serious applications. You may want to
 take a look at C<present()> and the C<prefetch> option instead.
 
+B<AS OF RELEASE 0.31, THIS METHOD IS NOW DEPRECATED.
+PLEASE USE record() INSTEAD.>
+
 =cut
 
 # We'd like to do this by just returning {records}->{$esn} of course, but
@@ -523,6 +534,7 @@ take a look at C<present()> and the C<prefetch> option instead.
 #
 sub records {
     my $this = shift();
+    warn "DEPRECATED method records() called on $this";
 
     my $size = $this->size();
     my $esn = $this->option('elementSetName');

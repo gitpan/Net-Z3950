@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.6 2002/02/08 17:41:20 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.13 2002/11/27 12:41:20 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -52,7 +52,8 @@ case, the connection is created under the control of a
 retrieved with the C<manager()> method.  Multiple connections made
 with no explicitly-specified manager in this way will all share the
 same implicit manager.  The default manager is initially in
-synchronous mode.
+synchronous mode.  If you don't understand what this paragraph is on
+about, you should feel free to ignore it.
 
 If the connection is created in synchronous mode, (or, if the
 constructor call doesn't specify a mode, if the manager controlling
@@ -64,6 +65,13 @@ new object is created and returned before the connection is forged;
 this will happen in parallel with subsequent actions.
 
 I<This is a lie: connecting is always done synchronously.>
+
+If a connection cannot be forged, then C<$!> contains an error code
+indicating what went wrong: this may be one of the usual system error
+codes such as ECONNREFUSED (if there is no server running at the
+specified address); alternatively, it may be set to the distinguished
+value -1 if the TCP/IP connection was correctly forged, but the Z39.50
+C<Init> failed.
 
 Any of the standard options (including synchronous or asynchronous
 mode) may be specified as additional arguments.  Specifically:
@@ -165,6 +173,17 @@ sub new {
     if ($this->option('mode') ne 'async') {
 	$this->expect(Net::Z3950::Op::Init, "init")
 	    or return undef;	# e.g. ECONNREFUSED
+
+	if (!$this->initResponse()->result()) {
+	    warn "checking initResponse";
+	    # Avoid having too may references hanging around, or we
+	    # end up closing the file twice, as various destructors
+	    # are called, and $! gets set to EBADF.
+	    undef $sock;
+	    $this->close();
+	    $! = -1;		# special errno value => init failed
+	    return undef;
+	}
     }
 
     return $this;
@@ -190,18 +209,7 @@ sub _ready_to_read {
 				# parameter to decodeAPDU()
     my $apdu = Net::Z3950::decodeAPDU($conn->{cs}, $reason);
     if (defined $apdu) {
-
-	if ($apdu->isa('Net::Z3950::APDU::Close')) {
-	    # XXX this should be handled properly - we should send a
-	    # reply, then drop the connection. Is there any better way
-	    # to notify to user than just dying? Should userland code be
-	    # allowed to handle this? I don't know. DAPM.
-
-	    $watcher->cancel();
-	    die "[$addr] received close request: " . $apdu->as_text .  "\n";
-	}
-
-	my $refId = $conn->_dispatch($apdu);
+	my $refId = $conn->_dispatch($apdu, $watcher);
 	if (!defined $refId) {
 	    # Unrecognised APDU -- nothing useful to do here, unless
 	    # we think die()ing might be helpful?
@@ -254,9 +262,18 @@ sub _ready_to_read {
 #
 sub _dispatch {
     my $this = shift();
-    my($apdu) = @_;
+    my($apdu, $watcher) = @_;
+    my $addr = $this->{host} . ":" . $this->{port};
 
-    if ($apdu->isa('Net::Z3950::APDU::InitResponse')) {
+    if ($apdu->isa('Net::Z3950::APDU::Close')) {
+	# ### This should be handled properly -- we should send a
+	# reply, then drop the connection.  Is there any better way to
+	# notify the user than just dying?  Should userland code be
+	# allowed to handle this?  I don't know -- DAPM.
+	$watcher->cancel();
+	die "[$addr] received close request: " . $apdu->as_text() .  "\n";
+
+    } elsif ($apdu->isa('Net::Z3950::APDU::InitResponse')) {
 	$this->{op} = Net::Z3950::Op::Init;
 	$this->{initResponse} = $apdu;
 	return $apdu->referenceId();
@@ -271,6 +288,7 @@ sub _dispatch {
 	$rs = _new Net::Z3950::ResultSet($this, $which, $apdu);
 	$this->{resultSets}->[$which] = $rs;
 	$this->{resultSet} = $rs;
+	### Should handle piggy-backed records and NSDs
 	return $which;
 
     } elsif ($apdu->isa('Net::Z3950::APDU::PresentResponse')) {
@@ -288,7 +306,7 @@ sub _dispatch {
 	return $apdu->referenceId();
 
     } else {
-	die "unsupported APDU [$apdu] ignored\n";
+	die "[$addr] ignored unsupported APDU: " . $apdu.as_text() . "\n";
     }
 }
 
@@ -414,7 +432,8 @@ A query-type option may be passed in, together with the query string
 itself as its argument.  Currently recognised query types are C<-ccl>
 (using the standard CCL query syntax, interpreted by the server),
 C<-ccl2rpn> (CCL query compiled by the client into a type-1 query) and
-C<-prefix> (using Index Data's prefix query notation).
+C<-prefix> (using Index Data's prefix query notation, described at
+http://indexdata.dk/yaz/doc/tools.php#PQF ).
 
 =item *
 
@@ -426,6 +445,16 @@ default for I<$conn> or its manager.
 
 The various query types are described in more detail in the
 documentation of the C<Net::Z3950::Query> class.
+
+I<### The Query class does not yet, and might never, exist.>
+
+Some broken Z39.50 server will fault a search but not provide any
+diagnostic records.  The correct fix for this problem is of course to
+poke the providers of those servers in the back of the knee with a
+teaspoon until they fix their products.  But since this is not always
+practical, C<Net::Z3950> provides a dummy diagnostic record in this
+case, with error-code 3 (``unsupported search'') and additional
+information set to ``no diagnostic records supplied by server''.
 
 =cut
 
@@ -468,7 +497,8 @@ sub startSearch {
 				      $this->option('smallSetUpperBound'),
 				      $this->option('largeSetLowerBound'),
 				      $this->option('mediumSetPresentNumber'),
-				      $nrss, # result-set name
+				      $this->option('namedResultSets') ?
+					$nrss : 'default', # result-set name
 				      $this->option('databaseName'),
 				      $this->option('smallSetElementSetName'),
 				      $this->option('mediumSetElementSetName'),
@@ -500,7 +530,7 @@ sub _enqueue {
 
 	$rs = $conn->search($srch);
 
-This utility method performs a blocking search, returning a reference
+This method performs a blocking search, returning a reference
 to the result set generated by the server.  It takes the same
 arguments as C<startSearch()>
 
@@ -597,7 +627,7 @@ the C<resultSet()> method described below.
 =item C<Net::Z3950::Op::Get>
 
 One or more result-set records have become available.  They may be
-obtained via the C<records()> method described below.
+obtained via the C<record()> method of the appropriate result set.
 
 =back
 
@@ -760,17 +790,8 @@ sub close {
     my $mgr = delete $this->{mgr};
     $mgr->forget($this);
 
-    $this->DESTROY();
-}
-
-
-sub DESTROY {
-    my $this = shift();
-
-    #warn "destroying Net::Z3950 Connection $this";
-
-    $this->{idleWatcher }->cancel() if defined $this->{idleWatcher};
-    $this->{readWatcher }->cancel() if defined $this->{readWatcher};
+    $this->{idleWatcher}->cancel() if defined $this->{idleWatcher};
+    $this->{readWatcher}->cancel() if defined $this->{readWatcher};
     $this->{writeWatcher}->cancel() if defined $this->{writeWatcher};
 
     # XXX for a V.3 connection, we should really send a closeRequest
@@ -788,6 +809,17 @@ sub DESTROY {
     # to break all circular references.
 
     %$this = ();
+    $this->{closed} = 1;
+}
+
+
+sub DESTROY {
+    my $this = shift();
+
+    #warn "destroying Net::Z3950 Connection $this";
+
+    $this->close() unless $this->{closed};
+
 }
 
 

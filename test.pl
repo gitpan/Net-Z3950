@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.3 2001/10/12 15:29:17 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.4 2002/10/21 18:27:00 mike Exp $
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -64,7 +64,7 @@ print "ok 4\n";
 
 # Forge connection to the local "yaz-ztest" server
 ### You need to be connected to the internet for this to work, of course.
-my $conn1 = $mgr->connect('www.indexdata.dk', 210)
+my $conn1 = $mgr->connect('bagel.indexdata.dk', 210)
     or (print "not ok 5 ($!)\n"), exit;
 print "ok 5\n";
 
@@ -196,7 +196,7 @@ print "ok 15\n";
 
 $rec->render() eq qq[6 fields:
 (1,1) 1.2.840.10003.13.2
-(1,14) "33"
+(1,14) "34"
 (2,1) "MINERAL OCCURRENCES, DEPOSITS, PROSPECTS, AND MINES"
 (4,52) "NEVADA BUREAU OF MINES AND GEOLOGY"
 (4,1) "ESDD0048"

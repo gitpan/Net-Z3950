@@ -1,8 +1,9 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/ywpriv.h,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/ywpriv.h,v 1.2 2002/08/23 16:16:34 mike Exp $ */
 
 #include "EXTERN.h"		/* Prerequisite for "perl.h" */
 #define yaz_log __some_stupid_function_in_the_linux_math_library
 #include "perl.h"		/* Is this enough for SV*? */
+#include "XSUB.h"
 #undef yaz_log
 #undef simple
 /*

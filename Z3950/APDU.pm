@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.7 2002/02/27 17:28:54 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.8 2002/07/19 15:44:16 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;

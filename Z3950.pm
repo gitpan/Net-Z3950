@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.15 2002/02/27 17:28:54 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.19 2002/07/26 12:21:10 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.30';
+$VERSION = '0.31';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -55,9 +55,10 @@ which allows multiple servers to be searched in parallel.)
 	$rs = $conn->search('au=kernighan or su=unix')
 	    or die $conn->errmsg();
 
-	foreach $i (1..$rs->size()) {
-	    $rec = $rs->record($i)
-		or die $rs->errmsg();
+	my $n = $rs->size();
+	print "found $n records:\n";
+	foreach $i (1..$n) {
+	    $rec = $rs->record($i) or die $rs->errmsg();
 	    print $rec->render();
 	}
 

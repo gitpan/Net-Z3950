@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.7 2002/02/27 17:28:54 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.9 2002/07/19 15:44:16 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.

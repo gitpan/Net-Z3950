@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.5 2002/02/27 17:28:54 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.7 2002/11/27 12:41:20 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -450,7 +450,7 @@ A new manager is created as follows:
 	$mgr = new Net::Z3950::Manager();
 
 Once the manager exists, a new connection can be made through it by
-specifying the manager reference as the first option to the connection
+specifying the manager reference as the first argument to the connection
 constructor:
 
 	$conn = new Net::Z3950::Connection($mgr, 'indexdata.dk', 210);
@@ -655,6 +655,15 @@ C<Net::Z3950::RecordSyntax::GRS1>
 =item C<elementSetName>
 
 C<'b'>
+
+=item C<namedResultSets>
+
+C<1> indicating boolean true.  This option tells the client to use a
+new result set name for each new result set generated, so that old
+C<ResultSet> objects remain valid.  For the benefit of old, broken
+servers, this option may be set to 0, indicating that same result-set
+name, C<default>, should be used for each search, so that each search
+invalidates all existing C<ResultSet>s.
 
 =back
 
