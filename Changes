@@ -1,0 +1,56 @@
+$Header: /home/cvsroot/perlZ3950/Changes,v 1.5 2000/10/06 10:01:03 mike Exp $
+
+Revision history for Perl extension Net::Z3950.
+
+0.11  Fri Feb  9 11:31:34 2001
+	- Fix Net::Z3950::ResultSet->record() to work correctly in
+	  synchronous mode (i.e. wait for the record to become
+	  available before returning.)
+	- Add rawdata() method to the various Net::Z3950::Record::*
+	  classes: we now have a distinction between render() and
+	  rawdata(), concepts which were previously mulched in
+	  together very unhelpfully.
+	- Add Tutorial.
+	- FIRST PUBLIC RELEASE ON CPAN
+
+0.10  Wed Nov 29 16:39:47 2000
+	- Change module name from Z3950 to Net::Z3950
+
+0.04  Fri Sep 22 17:51:28 2000
+	- Fix so that diagnostics are available after search failure.
+	- Add trivial "straight through" support for USMARC and some
+	  of the related record syntaxes.
+	- Support for OID-typed fields in GRS-1 records.
+	- Change default database to "Default" (it had the profoundly
+	  unhelpful default of "hardwired-databaseName"!)
+	- Modify the internal class hierarchy to make MARC support
+	  hang together more easily (yazwrap library now returns
+	  ...::Record::<RS> objects instead of ...::APDU::<RS>)
+	- Improve diagnostics when low-level translation of C objects
+	  into Perl objects fails.
+
+0.03  Thu Jun 29 15:38:33 2000
+	- First version to be held in CVS at indexdata.dk
+	- Add CVS identification headers where they're missing, fix
+	  some that lacked the trailing $-sign (duh.)
+	- Fix the search() and records() wrapper methods so that much
+	  simpler single-threaded clients can be easily written.
+
+0.02  Tue Jun 27 21:28:56 2000
+	- Make the $port argument optional in the Z3950::Connection
+	  constructor.
+	- Add support for mnchar* (T_MNPV) to the typemap file: this
+	  is a Maybe-Null PV, into which undefined values may be
+	  passed yielding null pointers.
+	- Add samples/fetch1.pl, which actually works (unlike the
+	  other scripts in the samples directory, which are written to
+	  a pre-0.1 version of the interface.)
+	- Remove obsolete bits of the README file.
+
+0.01  Tue May 23 09:20:30 2000
+	- Originally created by h2xs 1.19
+	- 0.01 was the first numbered version.  Earlier versions were
+	  never assigned numbers as they never got outside the
+	  author's house; this is the first one that was sent to Index
+	  Data.
+
