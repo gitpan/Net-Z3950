@@ -1,4 +1,4 @@
-# $Id: Manager.pm,v 1.17 2003/12/19 16:08:32 mike Exp $
+# $Id: Manager.pm,v 1.19 2004/03/16 14:13:30 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -124,6 +124,10 @@ sub option {
 sub _default {
     my($type) = @_;
 
+    # Used in Net::Z3950::Manager::wait()
+    return undef if $type eq 'die_handler';
+    return undef if $type eq 'timeout';
+
     # Used in Net::Z3950::ResultSet::record() to determine whether to wait
     return 0 if $type eq 'async';
     return 'sync' if $type eq 'mode'; # backward-compatible old option
@@ -238,8 +242,9 @@ sub wait {
     $Event::DIED = defined $handler ? $handler :
 	\&Event::verbose_exception_handler;
 
-    my $conn = Event::loop();
-    return $conn;
+    my $timeout = $this->option("timeout");
+    # Stupid Event::loop() makes a distinction between undef and not there
+    return defined $timeout ? Event::loop($timeout) : Event::loop();
 }
 
 

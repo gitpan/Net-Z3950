@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.10 2003/11/21 12:05:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.11 2004/03/16 14:13:30 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -571,6 +571,17 @@ follows.  (Please excuse the execrable formatting - that's what
 C<pod2html> does, and there's no sensible way around it.)
 
 =over 4
+
+=item C<die_handler>
+
+C<undef>
+A function to invoke if C<die()> is called within the main event loop.
+
+=item C<timeout>
+
+C<undef>
+The maximum number of seconds a manager will wait when its C<wait()>
+method is called.  B<Can not be set on a per-connection basis.>
 
 =item C<async>
 

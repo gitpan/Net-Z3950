@@ -1,6 +1,16 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.50 2003/12/19 16:09:39 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.51 2004/03/16 14:13:30 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.40  Tue Mar 16 13:57:33 GMT 2004
+	- A timeout may be set for a Net::Z3950::Manager's wait() by
+	  setting that manager's "timeout" option to the maximum
+	  number of seconds to wait.  Donald Knuth once wrote,
+	  "Beware: this code has not been tested, only proved
+	  correct."  _This_ code improves on Knuth in that it has been
+	  neither tested _nor_ proved correct.  However, I give you my
+	  solemn promise that I think it probably works, as likely as
+	  not.
 
 0.39  Fri Dec 19 16:08:35 2003
 	- Recognise record-syntax names such as "USMARC" as well as
