@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.12 2003/09/16 14:12:37 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.13 2003/10/24 10:08:28 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -414,7 +414,7 @@ sub _maybeValue {
 
 sub rawdata {
     my $this = shift();
-    return $$this;
+    return $this;
 }
 
 

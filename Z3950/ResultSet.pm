@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.12 2003/09/06 01:21:18 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.13 2003/10/24 12:29:05 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -369,7 +369,7 @@ sub _insert_records {
     my($apdu, $first, $howmany) = @_;
     # $first is 1-based; $howmany is used only when storing NSDs.
 
-    my $esn = $this->option('elementSetName');
+    my $esn = $this->option('elementSetName'); ### might this have changed?
     my $records = $this->{records}->{$esn};
     my $rawrecs = $apdu->records();
 
@@ -423,7 +423,7 @@ sub _insert_records {
 	### We're ignoring databaseName -- do we have any use for it?
 	my $which = $record->which();
 	if ($which == Net::Z3950::NamePlusRecord::DatabaseRecord) {
-	    $records->[$first+$i] = $record->databaseRecord();
+	    $records->[$first+$i] = $this->_tweak($record->databaseRecord());
 	} elsif ($which == Net::Z3950::NamePlusRecord::SurrogateDiagnostic) {
 	    $records->[$first+$i] = $record->surrogateDiagnostic();
 	} else {
@@ -433,6 +433,33 @@ sub _insert_records {
     }
 
     return 1;
+}
+
+
+# PRIVATE to _insert_records()
+sub _tweak {
+    my($this, $rec) = @_;
+
+    # Ninety-nine times out of a hundred, all we need to do here is
+    # return the $rec argument directly, so that the application gets
+    # precisely the record returned from the server.  However, a small
+    # but significant set of very badly-behaved servers sometimes take
+    # it upon themselves to return USMARC records when OPAC records
+    # have been requested but there is no holdings information.  For
+    # the benefit of those misbegotten monstrosities, we wrap such
+    # unwanted USMARC records in an otherwise empty OPAC-record
+    # structure.  <sigh>
+    if ($this->option('preferredRecordSyntax') ==
+	Net::Z3950::RecordSyntax::OPAC &&
+	$rec->isa("Net::Z3950::Record::USMARC")) {
+	return bless {
+	    bibliographicRecord => $rec,
+	    num_holdingsData => 0,
+	    holdingsData => [],
+	}, "Net::Z3950::Record::OPAC";
+    }
+
+    return $rec;
 }
 
 
