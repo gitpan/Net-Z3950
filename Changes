@@ -1,6 +1,12 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.4 2001/06/22 08:32:38 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.5 2001/07/18 12:20:47 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.14  Wed Jul 18 13:25:06 2001
+	- Add support for retrieving XML records: new record-syntax
+	  enumerations TEXT_XML and APPLICATION_XML, and a new
+	  record-type class Net::Z3950::Record::XML.
+	- Minor fixes to documentation, comments, etc.
 
 0.13  Fri Jun 22 09:30:55 2001
 	- In yazwrap/util.c, change socklen_t to size_t since the

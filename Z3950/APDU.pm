@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.2 2001/07/18 12:20:47 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -179,22 +179,26 @@ Net::Z3950::NamePlusRecord::FinalFragment
 When C<which()> is C<Net::Z3950::NamePlusRecord::DatabaseRecord>, the
 object returned from the C<databaseRecord()> method will be a decoded
 Z39.50 EXTERNAL.  Its type may be any of the following (and may be
-tested using C<$rec-E<gt>isa('Net::Z3950::APDU::Whatever')> if necessary.)
+tested using C<$rec-E<gt>isa('Net::Z3950::Record::Whatever')> if necessary.)
 
 =over 4
 
 =item *
 
-Net::Z3950::Record::SUTRS (a subclass of Net::Z3950::APDU::SUTRS)
+Net::Z3950::Record::SUTRS
 
 =item *
 
-Net::Z3950::Record::GRS1 (a subclass of Net::Z3950::APDU::GRS1)
+Net::Z3950::Record::GRS1
 
 =item *
 
-Net::Z3950::Record::USMARC (a subclass of Net::Z3950::APDU::USMARC) and
+Net::Z3950::Record::USMARC and
 similarly, Net::Z3950::Record::UKMARC, Net::Z3950::Record::NORMARC, I<etc>.
+
+=item *
+
+Net::Z3950::Record::XML
 
 I<### others, not yet supported>
 

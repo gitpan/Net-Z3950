@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.2 2001/02/16 16:51:06 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.3 2001/07/18 12:20:47 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -281,9 +281,11 @@ The record syntaxes which may be requested are listed in the
 C<Net::Z3950::RecordSyntax> enumeration in the file C<Net/Z3950.pm>;
 they include
 C<Net::Z3950::RecordSyntax::GRS1>,
-C<Net::Z3950::RecordSyntax::SUTRS>
+C<Net::Z3950::RecordSyntax::SUTRS>,
+C<Net::Z3950::RecordSyntax::USMARC>,
+C<Net::Z3950::RecordSyntax::TEXT_XML>
 and
-C<Net::Z3950::RecordSyntax::USMARC>.
+C<Net::Z3950::RecordSyntax::APPLICATION_XML>.
 
 (As always, C<option()> may also be invoked with no ``value''
 parameter to return the current value of the option.)
@@ -593,10 +595,12 @@ Any other option's value is undefined.
 
 =head1 ASYNCHRONOUS MODE
 
-I don't propose to discuss this at the moment, since I think it's
-more important to get the Tutorial out there with the synchronous
-stuff in place than to write the asynchronous stuff.  I'll do it soon,
-honest.
+I don't propose to discuss this at the moment, since I think it's more
+important to get the Tutorial out there with the synchronous stuff in
+place than to write the asynchronous stuff.  I'll do it soon, honest.
+In the mean time, let me be clear: the asynchronous code itself is
+done and works (the synchronous interface is merely a thin layer on
+top of it) - it's only the I<documentation> that's not yet here.
 
 B<### Note to self - write this section!>
 

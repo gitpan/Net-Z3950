@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.3 2001/06/22 08:32:38 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.5 2001/07/18 12:26:26 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -137,6 +137,8 @@ sub SUMMARY    { 36 }
 sub GRS0       { 37 }
 sub GRS1       { 38 }
 sub EXTENDED   { 39 }
+sub TEXT_XML   { 80 }
+sub APPLICATION_XML { 81 }
 package Net::Z3950;
 
 
@@ -194,7 +196,7 @@ use Net::Z3950::Manager;
 use Net::Z3950::Connection;
 use Net::Z3950::APDU;
 use Net::Z3950::ResultSet;
-use Net::Z3950::Record;		### Not yet implemented
+use Net::Z3950::Record;
 #use Net::Z3950::Query;		### Not yet implemented
 #use Net::Z3950::Diagnostic;		### Not yet implemented
 

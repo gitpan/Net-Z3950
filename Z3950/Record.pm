@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.2 2001/02/16 16:51:06 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.3 2001/07/18 12:20:47 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -19,9 +19,10 @@ Net::Z3950::Record - base class for records retrieved from a Z39.50 server
 A Record object represents a record retrieved from a Z39.50 server.
 In fact, the C<Net::Z3950::Record> class itself is never instantiated:
 instead, the Net::Z3950 module creates objects of subclasses such as
-C<Net::Z3950::Record::SUTRS>, C<Net::Z3950::Record::GRS1> and
-C<Net::Z3950::Record::USMARC>.  This class defines a common interface which
-must be supported by all such subclasses.
+C<Net::Z3950::Record::SUTRS>, C<Net::Z3950::Record::GRS1>,
+C<Net::Z3950::Record::USMARC> and C<Net::Z3950::Record::XML>.
+This class defines a common interface which must be supported by all
+such subclasses.
 
 =head1 METHODS
 
@@ -84,9 +85,8 @@ sub rawdata {
 
 Represents a a record using the Simple Unstructured Text Record
 Syntax (SUTRS) - a simple flat string containing the record's data in
-a form suitable for presentation to humans (so that the same thing is
-returned by the C<render()> and C<rawdata()> methods return the same
-thing.)
+a form suitable for presentation to humans (so that the C<render()>
+and C<rawdata()> methods return the same thing.)
 
 See Appendix REC.2 (Simple Unstructured Text Record Syntax) of the
 Z39.50 Standard for more information.
@@ -265,6 +265,38 @@ use vars qw(@ISA);
 @ISA = qw(Net::Z3950::Record Net::Z3950::APDU::DANMARC);
 sub nfields { return 1 }
 sub render { return ${ shift() } }
+
+
+=head2 Net::Z3950::Record::XML
+
+Represents a a record using XML (Extended Markup Language), as defined
+by the W3C.  Rendering is not currently defined: this module treats
+the record as a single opaque lump of data, to be parsed by other
+software.
+
+For more information about XML, see http://www.w3.org/XML/
+
+=cut
+
+package Net::Z3950::Record::XML;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::XML);
+#   ###	I don't think there's any such thing as ...::APDU::XML (and
+#	the same applies to the analogous classes for other record
+#	types.)
+
+sub nfields {
+    return 1;			### not entirely true
+}
+
+sub render {
+    return "[can't render a Net::Z3950::Record::XML - not yet implemented]\n";
+}
+
+sub rawdata {
+    my $this = shift();
+    return $$this;
+}
 
 
 =head2 ### others, not yet supported

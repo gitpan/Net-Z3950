@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.2 2001/07/18 12:20:47 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -338,7 +338,7 @@ static SV *translateExternal(Z_External *x)
     case Z_External_octet:
 	/* This is used for any opaque data-block (i.e. just a hunk of
 	 * octets) -- in particular, for records in any of the *MARC
-	 * syntaxes.
+	 * syntaxes and for XML records.
 	 */
 	return translateOctetAligned(x->u.octet_aligned, x->direct_reference);
     default:
@@ -462,7 +462,9 @@ static SV *translateElementData(Z_ElementData *x)
  * maps it to a class-name string.
  *
  * We assume that the record, not processed here, will subsequently be
- * picked apart by some pre-existing module, most likely MARC.pm
+ * picked apart by some pre-existing module, most likely MARC.pm for
+ * *MARC records; I'd be interested to know what people use for XML
+ * records.
  */
 static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 {
@@ -475,6 +477,8 @@ static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 	{ VAL_NORMARC,		"Net::Z3950::Record::NORMARC" },
 	{ VAL_LIBRISMARC,	"Net::Z3950::Record::LIBRISMARC" },
 	{ VAL_DANMARC,		"Net::Z3950::Record::DANMARC" },
+	{ VAL_TEXT_XML,		"Net::Z3950::Record::XML" },
+	{ VAL_APPLICATION_XML,	"Net::Z3950::Record::XML" },
 	{ VAL_NOP }		/* end marker */
 	/* ### etc. */
     };
