@@ -213,6 +213,9 @@ sub wait {
     #	is?  There's no single main()-like entry-point to this
     #	library, so we may as well set Event's die()-handler just
     #	before we hand over control.
+    my $handler = $this->option('die_handler');
+    $Event::DIED = defined $handler ? $handler :
+	\&Event::verbose_exception_handler;
     $Event::DIED = \&Event::verbose_exception_handler;
 
     my $conn = Event::loop();

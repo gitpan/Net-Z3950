@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.7 2002/02/27 17:28:54 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.8 2002/02/28 07:23:07 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -95,7 +95,7 @@ Z39.50 Standard for more information.
 
 package Net::Z3950::Record::SUTRS;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::SUTRS);
+@ISA = qw(Net::Z3950::Record);
 
 sub nfields {
     return 1;			# by definition
@@ -127,7 +127,7 @@ for more information.
 
 package Net::Z3950::Record::GRS1;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::GRS1);
+@ISA = qw(Net::Z3950::Record);
 
 sub nfields {
     my $this = shift();
@@ -210,7 +210,7 @@ http://cpan.valueclick.com/authors/id/E/ES/ESUMMERS/
 
 package Net::Z3950::Record::USMARC;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::USMARC);
+@ISA = qw(Net::Z3950::Record);
 
 sub nfields {
     return 1;			# This is not really true - a record
@@ -244,31 +244,31 @@ sub rawdata {
 
 package Net::Z3950::Record::UKMARC;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::UKMARC);
+@ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
 sub render { return ${ shift() } }
 
 package Net::Z3950::Record::NORMARC;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::NORMARC);
+@ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
 sub render { return ${ shift() } }
 
 package Net::Z3950::Record::LIBRISMARC;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::LIBRISMARC);
+@ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
 sub render { return ${ shift() } }
 
 package Net::Z3950::Record::DANMARC;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::DANMARC);
+@ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
 sub render { return ${ shift() } }
 
 package Net::Z3950::Record::UNIMARC;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::UNIMARC);
+@ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
 sub render { return ${ shift() } }
 
@@ -286,17 +286,15 @@ For more information about XML, see http://www.w3.org/XML/
 
 package Net::Z3950::Record::XML;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::XML);
-#   ###	I don't think there's any such thing as ...::APDU::XML (and
-#	the same applies to the analogous classes for other opqaue
-#	record types.)
+@ISA = qw(Net::Z3950::Record);
 
 sub nfields {
     return 1;			### not entirely true
 }
 
 sub render {
-    return "[can't render a Net::Z3950::Record::XML - not yet implemented]\n";
+    my $this = shift();
+    return $$this;
 }
 
 sub rawdata {
@@ -318,7 +316,7 @@ For more information about HTML, see http://www.w3.org/MarkUp/
 
 package Net::Z3950::Record::HTML;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::HTML);
+@ISA = qw(Net::Z3950::Record);
 
 sub nfields {
     return 1;			### not entirely true
@@ -347,7 +345,7 @@ single opaque lump of data, to be parsed by other software.
 
 package Net::Z3950::Record::OPAC;
 use vars qw(@ISA);
-@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::OPAC);
+@ISA = qw(Net::Z3950::Record);
 
 sub nfields {
     return 1;			### not entirely true

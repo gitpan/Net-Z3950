@@ -570,7 +570,7 @@ static SV *translateOID(Odr_oid *x)
     *buf = '\0';
     for (i = 0; x[i] >= 0; i++) {
 	sprintf(buf + strlen(buf), "%d", (int) x[i]);
-	if (x[i+1] >- 0)
+	if (x[i+1] >= 0)
 	    strcat(buf, ".");
     }
 

@@ -198,6 +198,7 @@ sub _checkRequired {
 
     my $esn = $this->option('elementSetName');
     my $records = $this->{records}->{$esn};
+    return unless defined $records;
     my $n = @$records;
 
     ###	If our interface to the C function makePresentRequest allowed
@@ -316,6 +317,17 @@ sub _insert_records {
     my $esn = $this->option('elementSetName');
     my $records = $this->{records}->{$esn};
     my $rawrecs = $apdu->records();
+
+    # Some badly-behaved servers claim records but don't include any.
+    # Fake up an error in this case.
+    unless (defined $rawrecs) {
+	$rawrecs = bless {
+	    diagnosticSetId => '1.2.840.10003.4.1', # BIB-1 diagnostic set
+	    condition => 14, # System error in presenting records
+	    addinfo => 'No records supplied by server',
+	}, 'Net::Z3950::APDU::DefaultDiagFormat';
+    }
+
     if ($rawrecs->isa('Net::Z3950::APDU::DefaultDiagFormat')) {
 	# Now what?  We want to report the error back to the caller,
 	# but we got here from a callback from the event loop, and

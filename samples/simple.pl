@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.3 2002/01/22 14:51:01 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.4 2002/02/28 07:23:07 mike Exp $
 
 use Net::Z3950;
 
@@ -13,6 +13,7 @@ $rs = $conn->search($ARGV[3])
 
 my $n = $rs->size();
 print "found $n records:\n";
+$rs->option(preferredRecordSyntax => Net::Z3950::RecordSyntax::TEXT_XML);
 
 for (my $i = 0; $i < $n; $i++) {
     my $rec = $rs->record($i+1);

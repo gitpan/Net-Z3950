@@ -2,6 +2,19 @@ $Header: /home/cvsroot/NetZ3950/Changes,v 1.19 2002/02/27 17:28:54 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
 
+0.29  Fri May 17 17:07:53 2002
+	- Add ability to set custom exception-handler via
+	  'die_handler' option.
+	- Fix dereference-undef bug occurring when performing a second
+	  search on a connection without having fetched any records
+	  following the first search.
+	- Cope with servers which lie about the number of records in
+	  their present responses (the cads!)
+	- Fix to correctly translate OIDs in which one or more
+	  components is "0".
+		All of these changes are due to Dave Mitchell
+		<davem@fdgroup.com> -- thanks, Dave!
+
 0.28  Wed Feb 27 17:28:26 2002
 	- Change representation of OIDs from blessed reference to
 	  array of intergers to Boring Old String (dot-separated
