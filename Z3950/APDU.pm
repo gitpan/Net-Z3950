@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.9 2003/05/07 10:10:00 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.10 2003/06/26 22:20:17 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -138,6 +138,25 @@ use vars qw(@ISA @FIELDS);
 @ISA = qw(Net::Z3950::APDU);
 @FIELDS = qw(referenceId numberOfRecordsReturned nextResultSetPosition
 	     presentStatus records);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::DeleteRSResponse
+
+	referenceId()
+	deleteOperationStatus()
+
+(We don't bother to decode the rest of this APDU at the moment, since
+I bet everyone calls C<Net::Z3950::ResultSet::delete()> in void
+context.  If anyone wants more information out of it, we can wire it
+through.)
+
+=cut
+
+package Net::Z3950::APDU::DeleteRSResponse;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(referenceId deleteOperationStatus);
 sub _fields { @FIELDS };
 
 

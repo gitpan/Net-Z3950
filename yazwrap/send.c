@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.6 2003/01/21 16:46:41 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.7 2003/06/26 20:34:11 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -254,6 +254,33 @@ databuf makePresentRequest(databuf referenceId,
     if ((req->preferredRecordSyntax =
 	 record_syntax(odr, preferredRecordSyntax)) == 0)
 	return nodata(*errmsgp = "can't convert record syntax");
+
+    return encode_apdu(odr, apdu, errmsgp);
+}
+
+
+databuf makeDeleteRSRequest(databuf referenceId,
+			    char *resultSetId,
+			    char **errmsgp)
+{
+    static ODR odr = 0;
+    Z_APDU *apdu;
+    Z_DeleteResultSetRequest *req;
+    Z_ReferenceId zr;
+    Z_ResultSetId *rsList[1];
+    int x;
+
+    if (!prepare_odr(&odr, errmsgp))
+	return nodata((char*) 0);
+    apdu = zget_APDU(odr, Z_APDU_deleteResultSetRequest);
+    req = apdu->u.deleteResultSetRequest;
+
+    req->referenceId = make_ref_id(&zr, referenceId);
+    req->deleteFunction = &x;
+    x = Z_DeleteResultSetRequest_list;
+    req->num_resultSetList = 1;
+    req->resultSetList = &rsList[0];
+    rsList[0] = resultSetId;
 
     return encode_apdu(odr, apdu, errmsgp);
 }

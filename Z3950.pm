@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.22 2003/05/07 10:10:00 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.24 2003/06/26 22:20:17 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.34';
+$VERSION = '0.35';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -116,10 +116,11 @@ I<### To be written>
 # to be in a distinctive range (i.e. 3950 plus a small integer) so
 # that if they are misused in another context, they're easy to spot.
 package Net::Z3950::Op;
-sub Error  { 3951 }
-sub Init   { 3952 }
-sub Search { 3953 }
-sub Get    { 3954 }
+sub Error    { 3951 }
+sub Init     { 3952 }
+sub Search   { 3953 }
+sub Get      { 3954 }
+sub DeleteRS { 3955 }
 package Net::Z3950;
 
 
@@ -256,8 +257,10 @@ C<op()> method.
 sub opstr {
     my($op) = @_;
     return "error" if $op == Net::Z3950::Op::Error;
+    return "init" if $op == Net::Z3950::Op::Init;
     return "search" if $op == Net::Z3950::Op::Search;
     return "get" if $op == Net::Z3950::Op::Get;
+    return "deleteRS" if $op == Net::Z3950::Op::DeleteRS;
     return "unknown op " . $op;
 }
 

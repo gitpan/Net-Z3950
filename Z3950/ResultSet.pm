@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.9 2002/10/08 16:18:12 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.11 2003/06/26 22:20:17 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -574,6 +574,39 @@ sub records {
     }
 
     return @res;
+}
+
+
+=head2 delete()
+
+	$ok = $rs->delete();
+	if (!$ok) {
+		print "can't delete: ", $rs->errmsg(), "\n";
+	}
+
+Requests the server to delete the result set corresponding to C<$rs>.
+Return non-zero on success, zero on failure.
+
+=cut
+
+sub delete {
+    my $this = shift();
+
+    my $errmsg = '';
+    my $refId = _bind_refId($this->{rsName}, "delete", 0);
+    my $dr = Net::Z3950::makeDeleteRSRequest($refId,
+					     $this->{rsName},
+					     $errmsg);
+    die "can't make present request: $errmsg" if !defined $dr;
+    my $conn = $this->{conn};
+    $conn->_enqueue($dr);
+
+    ### The remainder of this method enforces synchronousness
+    if (!$conn->expect(Net::Z3950::Op::DeleteRS, "deleteRS")) {
+	return undef;
+    }
+
+    return $conn->{deleteStatus};
 }
 
 

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.10 2003/05/07 10:10:00 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.11 2003/06/26 22:20:17 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -18,6 +18,8 @@ static SV *translateAPDU(Z_APDU *apdu, int *reasonp);
 static SV *translateInitResponse(Z_InitResponse *res, int *reasonp);
 static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp);
 static SV *translatePresentResponse(Z_PresentResponse *res, int *reasonp);
+static SV *translateDeleteRSResponse(Z_DeleteResultSetResponse *res,
+				     int *reasonp);
 static SV *translateClose(Z_Close *res, int *reasonp);
 static SV *translateRecords(Z_Records *x);
 static SV *translateNamePlusRecordList(Z_NamePlusRecordList *x);
@@ -155,6 +157,9 @@ static SV *translateAPDU(Z_APDU *apdu, int *reasonp)
 	return translateSearchResponse(apdu->u.searchResponse, reasonp);
     case Z_APDU_presentResponse:
 	return translatePresentResponse(apdu->u.presentResponse, reasonp);
+    case Z_APDU_deleteResultSetResponse:
+	return translateDeleteRSResponse(apdu->u.deleteResultSetResponse,
+					 reasonp);
     case Z_APDU_close:
 	return translateClose(apdu->u.close, reasonp);
     default:
@@ -219,6 +224,31 @@ static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp)
 
     /* additionalSearchInfo (OPT) not translated (complex data type) */
     /* otherInfo (OPT) not translated (complex data type) */
+
+    return sv;
+}
+
+static SV *translateDeleteRSResponse(Z_DeleteResultSetResponse *res,
+				     int *reasonp)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::DeleteRSResponse", (SV*) (hv = newHV()));
+
+    if (res->referenceId) {
+	setBuffer(hv, "referenceId",
+		  (char*) res->referenceId->buf, res->referenceId->len);
+    }
+
+    setNumber(hv, "deleteOperationStatus", (IV) *res->deleteOperationStatus);
+
+    /* ### We needn't bother with _any_ of this, really */
+    /* Z_ListStatuses *deleteListStatuses; /* OPT */
+    /* int *numberNotDeleted; /* OPT */
+    /* Z_ListStatuses *bulkStatuses; /* OPT */
+    /* Z_InternationalString *deleteMessage; /* OPT */
+    /* Z_OtherInformation *otherInfo; /* OPT */
 
     return sv;
 }

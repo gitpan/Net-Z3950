@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.9 2003/05/07 10:10:00 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.10 2003/05/14 13:50:10 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -246,31 +246,31 @@ package Net::Z3950::Record::UKMARC;
 use vars qw(@ISA);
 @ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
-sub render { return ${ shift() } }
+sub rawdata { return ${ shift() } }
 
 package Net::Z3950::Record::NORMARC;
 use vars qw(@ISA);
 @ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
-sub render { return ${ shift() } }
+sub rawdata { return ${ shift() } }
 
 package Net::Z3950::Record::LIBRISMARC;
 use vars qw(@ISA);
 @ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
-sub render { return ${ shift() } }
+sub rawdata { return ${ shift() } }
 
 package Net::Z3950::Record::DANMARC;
 use vars qw(@ISA);
 @ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
-sub render { return ${ shift() } }
+sub rawdata { return ${ shift() } }
 
 package Net::Z3950::Record::UNIMARC;
 use vars qw(@ISA);
 @ISA = qw(Net::Z3950::Record);
 sub nfields { return 1 }
-sub render { return ${ shift() } }
+sub rawdata { return ${ shift() } }
 
 
 =head2 Net::Z3950::Record::XML

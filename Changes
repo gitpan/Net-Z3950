@@ -1,6 +1,12 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.35 2003/05/12 09:20:49 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.38 2003/06/27 09:49:04 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.35  Fri Jun 27 10:48:03 2003
+	- Fix all non-US MARC record-types to return raw data from the
+	  rawdata() method rather than, as before, the render()
+	  method.
+	- Add a new delete() method to Net::Z3950::ResultSet
 
 0.34  Mon May 12 10:17:07 2003
 	- Slightly more robust cleanup in Manager::forget()
@@ -277,6 +283,10 @@ Revision history for Perl extension Net::Z3950.
 --
 
 To be done:
+	- Use the newer MARC::Record module instead of MARC.pm
+		### Not yet done
+		Render with  MARC::File::USMARC::decode($rec->rawdata())
+		Or with      MARC::Record ->as_formatted()
 	- ### Fix test.pl to work against either local or remote server.
 	- ### Make managers drop references to closed connections.
 	- ### Make $mgr->wait() finish when there are no connections left.

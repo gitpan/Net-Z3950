@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.3 2002/07/19 15:44:16 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.4 2003/06/26 20:34:11 mike Exp $ */
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -177,6 +177,14 @@ makePresentRequest(referenceId, resultSetId, resultSetStartPoint, numberOfRecord
 	int numberOfRecordsRequested
 	char *elementSetName
 	int preferredRecordSyntax
+	char *&errmsg
+	OUTPUT:
+	errmsg
+
+databuf
+makeDeleteRSRequest(referenceId, resultSetId, errmsg)
+	databuf referenceId
+	char *resultSetId
 	char *&errmsg
 	OUTPUT:
 	errmsg

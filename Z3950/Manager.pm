@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.8 2003/05/02 09:15:47 mike Exp $
+# $Id: Manager.pm,v 1.11 2003/06/27 09:45:29 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -40,6 +40,20 @@ manager is implicitly created along with the connection.
 =cut
 
 
+# PRIVATE for debugging
+sub warnconns {
+    return;			# Don't emit this debugging output
+    my($this) = shift;
+    my($label, @msg) = @_;
+
+    my $c = $this->{connections};
+    my $n = @$c;
+    warn "$label: $this has $n connections ($c) = { " .
+	join(", ", map { "'$_'" } @$c) . " } @msg";
+
+}
+
+
 =head2 new()
 
 	$mgr = new Net::Z3950::Manager();
@@ -65,10 +79,12 @@ sub new {
     my $class = shift();
     # No additional arguments except options
 
-    return bless {
+    my $this = bless {
 	connections => [],
 	options => { @_ },
     }, $class;
+    $this->warnconns("creation");
+    return $this;
 }
 
 
@@ -230,7 +246,9 @@ sub _register {
     my $this = shift();
     my($conn) = @_;
 
+    $this->warnconns("pre-register", "adding $conn");
     push @{$this->{connections}}, $conn;
+    $this->warnconns("post-register", "added $conn");
 }
 
 
@@ -243,7 +261,7 @@ control of the manager I<$mgr> and have not subsequently been closed.
 
 =cut
 
-sub connections {
+sub _UNUSED_connections {
     my $this = shift();
 
     return @{$this->{connections}};
@@ -277,13 +295,16 @@ sub forget {
     my $this = shift();
     my($conn) = @_;
 
-    my $n = $this->connections();
+    my $connections = $this->{connections};
+    my $n = @$connections;
+    $this->warnconns("forget()", "looking for $conn");
     for (my $i = 0; $i < $n; $i++) {
-	next if (!defined $this->{connections}->[$i] ||
-		 $this->{connections}->[$i] ne $conn);
-	# warn "forgetting connection $i of $n";
-	splice @{ $this->{connections} }, $i, 1;
-	return;
+	if (defined $connections->[$i] && $connections->[$i] eq $conn) {
+	    $this->warnconns("pre-splice", "forgetting $i of $n");
+	    splice @{ $this->{connections} }, $i, 1;
+	    $this->warnconns("post-splice", "forgot $i of $n");
+	    return;
+	}
     }
 
     die "$this can't forget $conn";

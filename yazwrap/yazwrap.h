@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.3 2002/07/19 15:44:16 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.4 2003/06/26 20:34:11 mike Exp $ */
 
 /*
  * yazwrap/yazwrap.h -- wrapper functions for Yaz's client API.
@@ -80,6 +80,13 @@ databuf makePresentRequest(databuf referenceId,
 			   /* otherInfo */
 			   char **errmsgp
 			   );
+
+databuf makeDeleteRSRequest(databuf referenceId,
+			    /* delete_function */
+			    char *resultSetId,
+			    /* otherInfo */
+			    char **errmsgp
+			    );
 
 SV *decodeAPDU(COMSTACK cs, int *reasonp);
 /*

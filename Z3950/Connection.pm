@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.13 2002/11/27 12:41:20 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.15 2003/06/27 09:45:29 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -294,7 +294,7 @@ sub _dispatch {
     } elsif ($apdu->isa('Net::Z3950::APDU::PresentResponse')) {
 	$this->{op} = Net::Z3950::Op::Get;
 	$this->{presentResponse} = $apdu;
-	# refId is of the form <rsindexex-junk>
+	# refId is of the form <rsindex>-<junk>
 	my $which = $apdu->referenceId();
 	defined $which or die "no reference Id in present response";
 	# Extract initial portion, local result-set index, from refId
@@ -305,8 +305,21 @@ sub _dispatch {
 	$this->{resultSet} = $rs;
 	return $apdu->referenceId();
 
+    } elsif ($apdu->isa('Net::Z3950::APDU::DeleteRSResponse')) {
+	$this->{op} = Net::Z3950::Op::DeleteRS;
+	$this->{deleteRSResponse} = $apdu;
+	# refId is of the form <rsindex>-delete-0
+	my $which = $apdu->referenceId();
+	defined $which or die "no reference Id in deleteRS response";
+	$which =~ s/-.*//;
+	my $rs = $this->{resultSets}->[$which]
+	    or die "reference to non-existent result set";
+	$this->{resultSets}->[$which] = undef; # drop reference to RS
+	$this->{deleteStatus} = $apdu->deleteOperationStatus();
+	return $apdu->referenceId();
+
     } else {
-	die "[$addr] ignored unsupported APDU: " . $apdu.as_text() . "\n";
+	die "[$addr] ignored unsupported APDU: $apdu\n";
     }
 }
 

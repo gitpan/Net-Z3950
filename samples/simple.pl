@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.8 2003/05/02 09:17:36 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.9 2003/06/26 21:38:37 mike Exp $
 
 use Net::Z3950;
 use strict;
@@ -37,3 +37,6 @@ for (my $i = 0; $i < $n; $i++) {
     }
     print "=== record ", $i+1, " ===\n", $rec->render();
 }
+
+$rs->delete();			# may not be supported by all servers
+$conn->close();

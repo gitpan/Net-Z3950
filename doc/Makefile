@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/doc/Makefile,v 1.4 2002/11/27 12:42:44 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/doc/Makefile,v 1.5 2003/06/26 21:39:45 mike Exp $
 
 MODULES = Z3950 Z3950/Tutorial Z3950/Manager Z3950/Connection Z3950/APDU \
 	Z3950/ResultSet Z3950/Record
@@ -24,3 +24,5 @@ Z3950/%.html: ../Z3950/%.pm
 clean:
 	rm -f $(HTML) Z3950/style.css $(JUNK)
 	rmdir Z3950
+
+distclean: clean

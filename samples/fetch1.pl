@@ -1,11 +1,14 @@
+#!/usr/bin/perl -w
+
 use Net::Z3950;
-$conn = new Net::Z3950::Connection('indexdata.dk', 210,
-				   databaseName => 'gils')
+$conn = new Net::Z3950::Connection('z3950.loc.gov', 7090,
+				   databaseName => 'Voyager')
     or die "can't connect: $!";
-$rs = $conn->search('mineral')
-    or die $conn->errmsg();
+$conn->option('preferredRecordSyntax', Net::Z3950::RecordSyntax::USMARC);
+$rs = $conn->search('@attr 1=7 0253333490')
+    or die "can't search: " . $conn->errmsg() . " (" . $conn->addinfo() . ")";
 print "found ", $rs->size(), " records:\n";
 exit if $rs->size() == 0;
-my $rec = $rs->record(1)
-    or die $rs->errmsg();
+$rec = $rs->record(1)
+    or die "can't get record: " . $rs->errmsg() . " (" . $rs->addinfo() . ")";
 print $rec->render();

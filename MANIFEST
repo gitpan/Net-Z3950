@@ -28,7 +28,6 @@ samples/canonical.pl
 samples/fetch1.pl
 samples/multiplex.pl
 samples/simple.pl
-samples/trivial.pl
 test.pl
 typemap
 yazwrap/Makefile.PL
