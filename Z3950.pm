@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.34 2004/03/31 12:28:01 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.35 2004/04/28 09:01:30 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.42';
+$VERSION = '0.43';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -121,6 +121,7 @@ sub Init     { 3952 }
 sub Search   { 3953 }
 sub Get      { 3954 }
 sub DeleteRS { 3955 }
+sub Scan     { 3956 }
 package Net::Z3950;
 
 
@@ -296,6 +297,7 @@ sub opstr {
     return "search" if $op == Net::Z3950::Op::Search;
     return "get" if $op == Net::Z3950::Op::Get;
     return "deleteRS" if $op == Net::Z3950::Op::DeleteRS;
+    return "scan" if $op == Net::Z3950::Op::Scan;
     return "unknown op " . $op;
 }
 

@@ -1,4 +1,4 @@
-# $Id: Manager.pm,v 1.21 2004/03/17 14:13:06 mike Exp $
+# $Id: Manager.pm,v 1.23 2004/05/06 13:14:14 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -119,7 +119,8 @@ sub option {
 # This function specifies the hard-wired global defaults used when
 # constructors and the option() method do not override them.
 #
-#	### Should have POD documentation for these options.
+#	### Should have POD documentation for these options.  At the
+#	moment, the only place they're described is in the tutorial.
 #
 sub _default {
     my($type) = @_;
@@ -166,6 +167,13 @@ sub _default {
     return 'F' if $type eq 'smallSetElementSetName';
     return 'B' if $type eq 'mediumSetElementSetName';
     return "GRS-1" if $type eq 'preferredRecordSyntax';
+
+    # Used in Net::Z3950::Connection::startScan()
+    ### Option names should be made ZOOM-friendly
+    ### Options should be documented
+    return 1 if $type eq 'preferredPositionInResponse';
+    return 0 if $type eq 'stepSize';
+    return 20 if $type eq 'numberOfTermsRequested';
 
     # Used in Net::Z3950::ResultSet::makePresentRequest()
     return 'B' if $type eq 'elementSetName';

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.12 2004/03/17 14:13:06 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.13 2004/04/28 09:04:00 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -318,6 +318,10 @@ C<Net::Z3950::RecordSyntax::TEXT_HTML>
 
 (As always, C<option()> may also be invoked with no ``value''
 parameter to return the current value of the option.)
+
+=head2 Scanning
+
+B<### Note to self - write this section!>
 
 
 =head1 WHAT TO DO WITH YOUR RECORDS

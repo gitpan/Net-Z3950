@@ -27,6 +27,7 @@ samples/batch-isbn.pl
 samples/canonical.pl
 samples/fetch1.pl
 samples/multiplex.pl
+samples/scan.pl
 samples/simple.pl
 test.pl
 typemap

@@ -1,6 +1,22 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.54 2004/03/31 12:28:01 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.56 2004/05/06 13:21:23 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.43  Thu May  6 14:19:56 2004
+	- Add support for Scan, using code contributed by Jan Bauer
+	  Nielsen <jbn@dtv.dk>, somewhat tidied up.  Use it like this:
+		$apdu = $conn->scan('@attr 1=1003 kern');
+		$status = $apdu->scanStatus();
+		if ($status == 6) print Dumper($apdu->diag());
+		$count = $apdu->numberOfEntriesReturned();
+		$term = $apdu->entries()->[0]->termInfo()->term()->general();
+		$hits = $apdu->entries()->[0]->termInfo()->globalOccurrences();
+	  Subsequent releases will support more corners of the Scan
+	  specification (e.g. displayTerm and friends), and present a
+	  much nicer API with a ZOOM-like ScanSet object.  See
+		http://zoom.z3950.org/api/zoom-1.4.html#3.6
+	- Included in the "samples" directory is a simple scanning
+	  client program, "scan.pl".
 
 0.42  Wed Mar 31 13:06:09 2004
 	- Add support for Unix-domain sockets: use "unix" as the

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.4 2003/06/26 20:34:11 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.5 2004/04/28 12:20:00 mike Exp $ */
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -168,6 +168,19 @@ makeSearchRequest(referenceId, smallSetUpperBound, largeSetLowerBound, mediumSet
 	char *&errmsg
 	OUTPUT:
 	errmsg
+
+databuf
+makeScanRequest(referenceId, databaseName, stepSize, numberOfTermsRequested, preferredPositionInResponse, queryType, query, errmsg)
+    databuf referenceId
+    char *databaseName
+    int stepSize
+    int numberOfTermsRequested
+    int preferredPositionInResponse
+    int queryType
+    char *query
+    char *&errmsg
+    OUTPUT:
+    errmsg
 
 databuf
 makePresentRequest(referenceId, resultSetId, resultSetStartPoint, numberOfRecordsRequested, elementSetName, preferredRecordSyntax, errmsg)

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.11 2003/09/06 01:44:40 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.12 2004/05/06 12:54:47 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -120,6 +120,30 @@ use vars qw(@ISA @FIELDS);
 @FIELDS = qw(referenceId resultCount numberOfRecordsReturned
 	     nextResultSetPosition searchStatus resultSetStatus
 	     presentStatus records);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::ScanResponse
+
+	referenceId()
+	stepSize()
+	scanStatus()
+	numberOfEntriesReturned()
+	positionOfTerm()
+	entries()
+	diag()
+
+The C<diag()> method should be consulted when C<scanStatus()> returns
+6, indicating failure; otherwise, C<entries()> may be consulted.
+
+=cut
+
+package Net::Z3950::APDU::ScanResponse;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(referenceId stepSize scanStatus
+             numberOfEntriesReturned positionOfTerm
+             entries diag);
 sub _fields { @FIELDS };
 
 
@@ -570,6 +594,73 @@ and we don't want the extra useless level of indirection).
 
 package Net::Z3950::APDU::OID;
 
+
+=head2 Net::Z3950::APDU::ListEntries
+
+No methods - just treat as a reference to an array of
+C<Net::Z3950::APDU::Entry>
+
+=cut
+
+package Net::Z3950::APDU::ListEntries;
+
+
+=head2 Net::Z3950::APDU::Entry
+
+	termInfo()
+	surrogateDiagnostic()
+
+Usually, C<termInfo()> returns a scanned term.  When it returns an
+undefined value, consult <surrogateDiagnostic()> to find out why.
+
+=cut
+
+package Net::Z3950::APDU::Entry;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(termInfo surrogateDiagnostic);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::TermInfo
+
+	term()
+	globalOccurrences()
+
+I<### Lots more to come here, including displayTerm>
+
+=cut
+
+package Net::Z3950::APDU::TermInfo;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(term globalOccurrences);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::Term
+
+	general()
+	numeric()
+	characterString()
+	oid()
+	dateTime()
+	external()
+	integerAndUnit()
+	null()
+
+At present only ``general'' terms are supported.  The value of such a
+term may be obtained by calling <general()>.  Terms of other types can
+not be obtained.
+
+=cut
+
+package Net::Z3950::APDU::Term;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+@FIELDS = qw(general numeric characterString oid
+             dateTime external integerAndUnit null);
+sub _fields { @FIELDS };
 
 
 =head1 AUTHOR

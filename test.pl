@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.6 2003/11/21 12:05:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.10 2004/05/06 13:04:17 mike Exp $
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -8,7 +8,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..16\n"; }
+BEGIN { $| = 1; print "1..23\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Net::Z3950;
 $loaded = 1;
@@ -204,6 +204,65 @@ $rec->render() eq qq[6 fields:
 ]
     or (print "not ok 16\n", $rec->render()), exit;
 print "ok 16\n";
+
+# Testing scan
+$conn->startScan('mineral');
+$conn = $mgr->wait()
+    or (print "not ok 17\n"), exit;
+print "ok 17\n";
+
+# Which operation fired?  Should be a Scan
+check_op(18, $conn->op(), Net::Z3950::Op::Scan);
+my $sr = $conn->scanResponse();
+
+if ($sr->scanStatus() != 0 ||
+    $sr->positionOfTerm() != 1 ||
+    $sr->stepSize() != 0 ||
+    $sr->numberOfEntriesReturned() != 20) {
+    print "not ok 19\n";
+    print "scanResponse APDU:\n";
+    foreach my $key (sort keys %$sr) {
+	print "$key -> $sr->{$key}\n";
+    }
+    exit;
+}
+print "ok 19\n";
+
+my $term0 = $sr->entries()->[0]->termInfo();
+my $term19 = $sr->entries()->[19]->termInfo();
+if ($term0->term()->general() ne "mineral" ||
+    $term0->globalOccurrences() != 18 ||
+    $term19->term()->general() ne "national" ||
+    $term19->globalOccurrences() != 2) {
+    print "not ok 20\n";
+    print "scanResponse entries:\n";
+    foreach my $entry (@{$sr->entries()}) {
+	foreach my $key (keys %{$entry}) {
+	    print("\t", $entry->termInfo()->term()->general(),
+		  " (" . $entry->termInfo()->globalOccurrences() . ")\n");
+	}
+    }
+}
+print "ok 20\n";
+
+# Check scan's error-reporting
+my $oldDB = $conn->option(databaseName => "nonExistentDB");
+$conn->startScan('fruit');
+$conn->option(databaseName => $oldDB);
+$conn = $mgr->wait()
+    or (print "not ok 21\n"), exit;
+print "ok 21\n";
+
+check_op(22, $conn->op(), Net::Z3950::Op::Scan);
+my $sr = $conn->scanResponse();
+
+if ($sr->scanStatus() != 6 ||
+    $sr->diag()->condition() != 109 ||
+    $sr->diag()->addinfo() ne "nonExistentDB") {
+    print "not ok 23\n";
+    { use Data::Dumper; print Dumper($sr); }
+}
+print "ok 23\n";
 
 print "\ntests complete\n";
 exit;

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.7 2003/06/26 20:34:11 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.8 2004/04/28 12:22:50 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -64,7 +64,7 @@ databuf makeInitRequest(databuf referenceId,
     ODR_MASK_SET(req->options, Z_Options_present);
     ODR_MASK_SET(req->options, Z_Options_namedResultSets);
     ODR_MASK_SET(req->options, Z_Options_triggerResourceCtrl); /* ### */
-    ODR_MASK_SET(req->options, Z_Options_scan);	/* ### */
+    ODR_MASK_SET(req->options, Z_Options_scan);
     ODR_MASK_SET(req->options, Z_Options_sort);	/* ### */
     ODR_MASK_SET(req->options, Z_Options_extendedServices); /* ### */
     ODR_MASK_SET(req->options, Z_Options_delSet); /* ### */
@@ -214,6 +214,88 @@ databuf makeSearchRequest(databuf referenceId,
 
     default:
 	return nodata(*errmsgp = "unknown queryType");
+    }
+
+    return encode_apdu(odr, apdu, errmsgp);
+}
+
+
+/* Inspired by the scan implementation from client.c
+ * in the source package of the YAZ C toolkit available
+ * at http://www.indexdata.dk/yaz/
+ */
+databuf makeScanRequest(databuf referenceId,
+                        char *databaseName,
+                        int stepSize,
+                        int numberOfTermsRequested,
+                        int preferredPositionInResponse,
+                        int queryType,
+                        char *query,
+			char **errmsgp)                    
+{
+    static ODR odr = 0;
+    Z_APDU *apdu;
+    Z_ScanRequest *req;
+    Z_ReferenceId zr;
+    static CCL_bibset bibset;
+    int oid[OID_SIZE];
+
+    if (!prepare_odr(&odr, errmsgp))
+        return nodata((char*) 0);
+
+    apdu = zget_APDU(odr, Z_APDU_scanRequest);
+    req = apdu->u.scanRequest;
+
+    req->referenceId = make_ref_id(&zr, referenceId);
+    req->num_databaseNames = 1;
+    req->databaseNames = &databaseName;
+    req->stepSize = &stepSize;
+    req->numberOfTermsRequested = &numberOfTermsRequested;
+    req->preferredPositionInResponse = &preferredPositionInResponse;
+
+    /* ### should this share code with makeSearchRequest()? */
+    if (queryType == QUERYTYPE_CCL2RPN) {
+        oident bib1;
+        int error, pos;
+        struct ccl_rpn_node *rpn;
+
+        rpn = ccl_find_str (bibset,  query, &error, &pos);
+        if (bibset == 0) {
+            FILE *fp;
+            bibset = ccl_qual_mk();
+            if ((fp = fopen("ccl.qual", "r")) != 0) {
+                ccl_qual_file(bibset, fp);
+                fclose(fp);
+            } else if (errno != ENOENT) {
+                return nodata (*errmsgp = "can't read CCL qualifier file");
+            }
+        }
+        rpn = ccl_find_str (bibset,  query, &error, &pos);
+        if (error) {
+            return nodata (*errmsgp = (char *) ccl_err_msg(error));
+        }
+        bib1.proto = PROTO_Z3950;
+        bib1.oclass = CLASS_ATTSET;
+        bib1.value = VAL_BIB1;
+        req->attributeSet = oid_ent_to_oid (&bib1, oid);
+
+        if (!(req->termListAndStartPoint = ccl_scan_query (odr, rpn))) {
+           return  nodata (*errmsgp = "can't convert CCL to Scan term");
+        }
+        ccl_rpn_delete (rpn);
+
+    } else {  /* QUERYTYPE_PREFIX */
+        YAZ_PQF_Parser pqf_parser = yaz_pqf_create ();
+
+        if (!(req->termListAndStartPoint =
+            yaz_pqf_scan(pqf_parser, odr, &req->attributeSet, query)))
+        {
+            size_t off;
+            int code = yaz_pqf_error (pqf_parser,(const char **) errmsgp, &off);
+            yaz_pqf_destroy (pqf_parser);
+            return nodata(*errmsgp);
+        }
+        yaz_pqf_destroy (pqf_parser);
     }
 
     return encode_apdu(odr, apdu, errmsgp);

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.4 2003/06/26 20:34:11 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.5 2004/04/28 12:13:08 mike Exp $ */
 
 /*
  * yazwrap/yazwrap.h -- wrapper functions for Yaz's client API.
@@ -61,6 +61,21 @@ databuf makeSearchRequest(databuf referenceId,
 			  /* additionalSearchInfo */
 			  /* otherInfo */
 			  );
+
+databuf makeScanRequest(databuf referenceId,
+                        /* num_databaseNames */
+                        char *databaseName,
+                        /* attributeSet */
+                        /* termListAndStartPoint -> queryType/query */
+                        int stepSize,
+                        int numberOfTermsRequested,
+                        int preferredPositionInResponse,
+                        int queryType,
+                        char *query,
+                        char **errmsgp
+                        /* otherInfo */
+                        );
+
 /* Constants for use as `querytype' argument to makeSearchRequest() */
 #define QUERYTYPE_PREFIX  39501	/* Yaz's "@attr"-ish forward-Polish notation */
 #define QUERYTYPE_CCL     39502	/* Send CCL string to server ``as is'' */

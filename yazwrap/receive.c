@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.14 2003/09/13 21:21:47 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.15 2004/05/06 13:12:48 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -17,6 +17,7 @@
 static SV *translateAPDU(Z_APDU *apdu, int *reasonp);
 static SV *translateInitResponse(Z_InitResponse *res, int *reasonp);
 static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp);
+static SV *translateScanResponse(Z_ScanResponse *res, int *reasonp);
 static SV *translatePresentResponse(Z_PresentResponse *res, int *reasonp);
 static SV *translateDeleteRSResponse(Z_DeleteResultSetResponse *res,
 				     int *reasonp);
@@ -24,6 +25,10 @@ static SV *translateClose(Z_Close *res, int *reasonp);
 static SV *translateRecords(Z_Records *x);
 static SV *translateNamePlusRecordList(Z_NamePlusRecordList *x);
 static SV *translateNamePlusRecord(Z_NamePlusRecord *x);
+static SV *translateListEntries(Z_ListEntries *x, int *isErrorp);
+static SV *translateEntry(Z_Entry *x);
+static SV *translateTermInfo(Z_TermInfo *x);
+static SV *translateTerm(Z_Term *x);
 static SV *translateExternal(Z_External *x);
 static SV *translateSUTRS(Z_SUTRS *x);
 static SV *translateGenericRecord(Z_GenericRecord *x);
@@ -160,6 +165,8 @@ static SV *translateAPDU(Z_APDU *apdu, int *reasonp)
 	return translateInitResponse(apdu->u.initResponse, reasonp);
     case Z_APDU_searchResponse:
 	return translateSearchResponse(apdu->u.searchResponse, reasonp);
+    case Z_APDU_scanResponse:
+	return translateScanResponse(apdu->u.scanResponse, reasonp);
     case Z_APDU_presentResponse:
 	return translatePresentResponse(apdu->u.presentResponse, reasonp);
     case Z_APDU_deleteResultSetResponse:
@@ -228,6 +235,35 @@ static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp)
 	setMember(hv, "records", translateRecords(res->records));
 
     /* additionalSearchInfo (OPT) not translated (complex data type) */
+    /* otherInfo (OPT) not translated (complex data type) */
+
+    return sv;
+}
+
+static SV *translateScanResponse(Z_ScanResponse *res, int *reasonp) {
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::ScanResponse", (SV*) (hv = newHV()));
+    if (res->referenceId) {
+	setBuffer(hv, "referenceId", (char*) res->referenceId->buf,
+	res->referenceId->len);
+    }
+
+    if (res->stepSize)
+	setNumber(hv, "stepSize", (IV) *res->stepSize);
+    setNumber(hv, "scanStatus", (IV) *res->scanStatus);
+    setNumber(hv, "numberOfEntriesReturned",
+	      (IV) *res->numberOfEntriesReturned);
+    if (res->positionOfTerm)
+	setNumber(hv, "positionOfTerm", (IV) *res->positionOfTerm);
+    if (res->entries) {
+	int isError = 0;
+	SV *tmp = translateListEntries(res->entries, &isError);
+	setMember(hv, isError ? "diag" : "entries", tmp);
+    }
+
+    /* attributeSet (OPT) not translated (complex data type) */
     /* otherInfo (OPT) not translated (complex data type) */
 
     return sv;
@@ -369,6 +405,118 @@ static SV *translateNamePlusRecord(Z_NamePlusRecord *x)
 	break;
     default:
 	fatal("illegal `which' in Z_NamePlusRecord");
+    }
+
+    return sv;
+}
+
+
+static SV *translateListEntries(Z_ListEntries *x, int *isErrorp) {
+    /*
+     * This might return either a ListEntries object or a
+     * DefaultDiagFormat object, depending on which of x->entries and
+     * x->nonsurrogateDiagnostics is set.  The ASN.1 says that both of
+     * these are optional but at least one must be included; but the
+     * Z39.50-1995 prose says that entries must _always_ be provided
+     * (presumably including when there are zero of them) and the
+     * diagnostics are optional.  So we take the pragmatic approach
+     * that if there are diagnostics we return them, otherwise the
+     * entries.  We further simplify by returning only the first
+     * diagnostic if there are several.
+     *
+     * The entries object is represented as a reference to a blessed
+     * array of elements
+     */
+    SV *sv;
+    AV *av;
+    int i;
+
+    if (x->nonsurrogateDiagnostics) {
+	/* If there's more than one diagnostic, we just use the first */
+	*isErrorp = 1;
+	return translateDiagRec(x->nonsurrogateDiagnostics[0]);
+    }
+
+    /* No diagnostics, so return the actual entries */
+    sv = newObject("Net::Z3950::APDU::ListEntries", (SV*) (av = newAV()));
+    for (i=0; i < x->num_entries; i++) {
+	av_push(av, translateEntry(x->entries[i]));
+    }
+
+    return sv;
+}
+
+
+static SV *translateEntry(Z_Entry *x) {
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::Entry", (SV*) (hv = newHV()));
+    switch (x->which) {
+    case Z_Entry_termInfo:
+	setMember(hv, "termInfo", translateTermInfo(x->u.termInfo));
+	break;
+    case Z_Entry_surrogateDiagnostic:
+	setMember(hv, "surrogateDiagnostic",
+	    translateDiagRec(x->u.surrogateDiagnostic));
+	break;
+    default:
+	fatal("illegal `which' in Z_Entry");
+    }
+
+    return sv;
+}
+
+
+static SV *translateTermInfo(Z_TermInfo *x) {
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::TermInfo", (SV*) (hv = newHV()));
+    setMember(hv, "term", translateTerm(x->term));
+
+    if (x->globalOccurrences)
+	setNumber(hv, "globalOccurrences", (IV) *x->globalOccurrences);
+
+    /* ### Lots of elements not translated here:
+     * displayTerm     [0] IMPLICIT InternationalString
+     * suggestedAttributes AttributeList OPTIONAL,
+     * alternativeTerm [4] IMPLICIT SEQUENCE OF AttributesPlusTerm OPTIONAL,
+     * byAttributes    [3] IMPLICIT OccurrenceByAttributes OPTIONAL,
+     * otherTermInfo       OtherInformation OPTIONAL}
+     */
+
+    return sv;
+}
+
+
+static SV *translateTerm(Z_Term *x) {
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::Term", (SV*) (hv = newHV()));
+
+    switch (x->which) {
+    case Z_Term_general:
+	setBuffer(hv, "general", x->u.general->buf, x->u.general->len);
+	break;
+    case Z_Term_numeric:
+	/* ### this won't do at all */
+	break;
+    case Z_Term_characterString:
+	break;
+    case Z_Term_oid:
+	break;
+    case Z_Term_dateTime:
+	break;
+    case Z_Term_external:
+	break;
+    case Z_Term_integerAndUnit:
+	break;
+    case Z_Term_null:
+	break;
+    default:
+	fatal("illegal `which' in Z_Term");
     }
 
     return sv;
@@ -522,7 +670,7 @@ static SV *translateElementData(Z_ElementData *x)
 
 
 static SV *translateOPACRecord(Z_OPACRecord *x)
-{ 
+{
     SV *sv, *sv2;
     HV *hv;
     AV *av;
