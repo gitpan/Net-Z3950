@@ -1,4 +1,4 @@
-$Header: /home/cvsroot/NetZ3950/README,v 1.8 2001/10/25 11:57:50 mike Exp $
+$Header: /home/cvsroot/NetZ3950/README,v 1.9 2003/01/21 16:46:41 mike Exp $
 
 Net::Z3950.pm -- What Is It?
 ----------------------------
@@ -30,12 +30,10 @@ prerequisites to building the Net::Z3950 module:
 	will most likely be fine; in fact, earlier version probably
 	will be too, since I don't do anything clever with it.
 
-    2.	You'll also need Index Data's Yaz toolkit, a set of C routines
-	for manipulating, sending and receiving the Z39.50 data
-	structures.  I've been using the current (May 2000)
-	development version, but again, I am not doing anything
-	unusual with it -- anything from version 1.5 upwards should be
-	fine.  You can find it at http://indexdata.dk/yaz/
+    2.	You'll also need version 1.8 or later of Index Data's Yaz
+	toolkit, a set of C routines for manipulating, sending and
+	receiving the Z39.50 data structures.  You can find it at
+	http://indexdata.dk/yaz/
 
 	I'm assuming that you've installed Yaz in the default places
 	-- binaries in /usr/local/bin, libraries in /usr/local/lib,

@@ -20,7 +20,9 @@ doc/index.html
 doc/style.css
 doc/todo.html
 doc/visit.html
+samples/ISBNs
 samples/README
+samples/batch-isbn.pl
 samples/canonical.pl
 samples/fetch1.pl
 samples/multiplex.pl

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.5 2002/02/11 12:57:34 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.6 2003/01/21 16:46:41 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -351,17 +351,14 @@ static databuf nodata(char *msg)
 /*
  * Simple wrapper for cs_write() when that comes along.  Also calls
  * cs_look() to detect the completion of a connection when that comes
- * along.  In the mean time, we fake both bits.
+ * along.
  */
 int yaz_write(COMSTACK cs, databuf buf)
 {
     if (cs_look(cs) == CS_CONNECT) {
-	/*
-	 * This is nonsense, but it works.  Fix it when Index Data provide
-	 * real cs_look(), which should be Real Soon Now.
-	 */
-	errno = ECONNREFUSED;
-	return -1;		
+	if (cs_rcvconnect(cs) < 0) {
+	    return -1;
+	}
     }
 
     return write(cs_fileno(cs), buf.data, buf.len);

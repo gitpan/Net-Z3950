@@ -1,6 +1,8 @@
+.cvsignore
 CVS
 Z3950/CVS
 doc/.cvsignore
 doc/CVS
 samples/CVS
+yazwrap/.cvsignore
 yazwrap/CVS

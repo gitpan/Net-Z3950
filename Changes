@@ -1,6 +1,14 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.27 2002/11/27 12:41:54 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.28 2003/01/21 16:50:14 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.32  Tue Jan 21 16:46:23 2003
+	- Remove the old, unnecessary and confusing code that patched
+	  around the absence of cs_look() and cs_rcvconnect() in YAZ.
+	  In fact, they've both been there since version 1.8 (the one
+	  that introduced ZOOM-C), fourteen months ago.  This change
+	  cleans up the code and fixes an intermittent error that Dave
+	  Mitchell had run into.  You now need v1.8 of YAZ or newer.
 
 0.31  Wed Nov 27 12:40:50 2002
 	- Add command-line options to samples/simple.pl

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/ywpriv.h,v 1.2 2002/08/23 16:16:34 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/ywpriv.h,v 1.3 2003/01/21 16:46:41 mike Exp $ */
 
 #include "EXTERN.h"		/* Prerequisite for "perl.h" */
 #define yaz_log __some_stupid_function_in_the_linux_math_library
@@ -26,4 +26,3 @@
 #include "yazwrap.h"
 
 void fatal(char *fmt, ...);
-int cs_look(COMSTACK cs);
