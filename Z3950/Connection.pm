@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.5 2002/01/29 10:34:15 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.6 2002/02/08 17:41:20 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;

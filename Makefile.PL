@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.1.1.1 2001/02/12 10:53:54 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.2 2002/02/08 17:41:20 mike Exp $
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence

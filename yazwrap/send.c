@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.4 2002/01/29 10:34:15 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.5 2002/02/11 12:57:34 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -152,7 +152,8 @@ databuf makeSearchRequest(databuf referenceId,
     *req->largeSetLowerBound = largeSetLowerBound;
     *req->mediumSetPresentNumber = mediumSetPresentNumber;
     *req->replaceIndicator = 1;
-    req->resultSetName = resultSetName;
+    if (strcmp (resultSetName, "0") != 0)
+	req->resultSetName = resultSetName;
     req->num_databaseNames = 1;
     req->databaseNames = &databaseName;
 
@@ -240,7 +241,8 @@ databuf makePresentRequest(databuf referenceId,
     req = apdu->u.presentRequest;
 
     req->referenceId = make_ref_id(&zr, referenceId);
-    req->resultSetId = resultSetId;
+    if (strcmp (resultSetId, "0") != 0)
+	req->resultSetId = resultSetId;
     *req->resultSetStartPoint = resultSetStartPoint;
     *req->numberOfRecordsRequested = numberOfRecordsRequested;
     req->num_ranges = 0;	/* ### would be nice to support this */

@@ -1,6 +1,11 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.16 2002/01/29 15:47:46 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.18 2002/02/11 12:57:34 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.27  Mon Feb 11 12:59:05 2002
+	- Incorporate a patch from Adam <adam@indexdata.dk> to allow
+	  Net::Z3950 to work against servers that don't support named
+	  result sets.  Ah, so simple, so elegant!
 
 0.26  Fri Feb  8 16:06:15 2002
 	- OK.  This time I have _really_ fixed connecting to work
