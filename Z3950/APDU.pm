@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.3 2001/10/12 15:16:13 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.4 2001/10/18 13:29:23 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -43,6 +43,15 @@ sub AUTOLOAD {
 	if !grep { $_ eq $fieldname } $class->_fields();
 
     return $this->{$fieldname};
+}
+
+sub DESTROY {
+    # Do nothing.  This is only here because on some installations --
+    # I don't really have a handle on what the condition is --
+    # APDU-derived objects try to call DESTROY when they're thrown
+    # away, and that was getting translated into a call to AUTOLOAD,
+    # which was complaining "field `DESTROY' not defined".  Now that
+    # we have an explicit no-opping DESTROY, that shouldn't happen.
 }
 
 

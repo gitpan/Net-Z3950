@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/multiplex.pl,v 1.2 2001/10/12 15:16:14 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/multiplex.pl,v 1.3 2001/10/18 12:30:07 mike Exp $
 
 use Net::Z3950;
 use strict;
@@ -34,10 +34,13 @@ sub done_search {
     my($conn, $apdu) = @_;
 
     my $si = $conn2si{$conn};
-    my $rs = $conn->resultSet()
-	or die $conn->errmsg();
-    print $conn->name(), " - search ", $si+1,
-	  " found ", $rs->size(), " records\n";
+    my $rs = $conn->resultSet();
+    if (!defined $rs) {
+	print $conn->name(), " - search failed: ", $conn->errmsg(), "\n";
+    } else {
+	print $conn->name(), " - search ", $si+1,
+	      " found ", $rs->size(), " records\n";
+    }
     my $search = $searches[++$conn2si{$conn}];
     if (defined $search) {
 	$conn->startSearch($search, \&done_search);
