@@ -1,6 +1,30 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.56 2004/05/06 13:21:23 mike Exp $
+$Id: Changes,v 1.59 2004/05/07 17:42:54 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.44  Fri May  7 18:00:54 2004
+	Note that this release consists entirely of
+	backwards-incompatible changes to new functionality introduced
+	in 0.43, the previous release.  If you use Scan, then all your
+	Scan code must change; if you do not use Scan, then this
+	release will not affect you at all.
+	- Change scan-option names to be ZOOM-compliant.
+	- Introduce a new enumeration, Net::Z3950::ScanStatus
+	- Add a new class, Net::Z3950::ScanSet, representing the
+	  results of a Scan operation.  This is compliant with the
+	  ZOOM Abstract API, and supports much nicer client code than
+	  the previous release:
+		$ss = $conn->scan('@attr 1=1003 kern');
+		$status = $ss->status();
+		print $ss->errmsg()
+		    if $status == Net::Z3950::ScanSet::Failure;
+		$count = $ss->size();
+		($term, $hits) = $ss->term(0);
+	  The scanResponse APDU, which used to be returned from the
+	  scan() method, is still available via the scanResponse()
+	  method, but there is no reason for new code to call this.
+	- Complete rewrite of the sample client "scan.pl" to use the
+	  new API.
 
 0.43  Thu May  6 14:19:56 2004
 	- Add support for Scan, using code contributed by Jan Bauer

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.13 2004/04/28 09:04:00 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.14 2004/05/07 15:40:19 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -665,6 +665,23 @@ C<'b'>
 =item C<preferredRecordSyntax>
 
 C<'GRS-1'>
+
+=item C<responsePosition>
+
+C<1>
+(Indicates the one-based position of the start term in the set of
+terms returned from a scan.)
+
+=item C<stepSize>
+
+C<0>
+(Indicates the number of terms between each of the terms returned from
+a scan.)
+
+=item C<numberOfEntries>
+
+C<20>
+(Indicates the number of terms to return from a scan.)
 
 =item C<elementSetName>
 

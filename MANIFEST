@@ -11,6 +11,7 @@ Z3950/Connection.pm
 Z3950/Manager.pm
 Z3950/Record.pm
 Z3950/ResultSet.pm
+Z3950/ScanSet.pm
 Z3950/Tutorial.pm
 ccl.qual
 doc/Albums

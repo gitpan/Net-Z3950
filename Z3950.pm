@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.35 2004/04/28 09:01:30 mike Exp $
+# $Id: Z3950.pm,v 1.37 2004/05/07 16:59:46 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.43';
+$VERSION = '0.44';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -212,12 +212,11 @@ sub CCL2RPN { 39503 }		# Convert CCL to RPN (type-1) locally
 package Net::Z3950;
 
 
-### Move to Net::Z3950::APDU.pm?  Not currently used anyway
 # Define the result-set-status enumeration, used by the
-# `resultSetStatus' field in the Net::Z3950::SearchResponse class in cases
-# where `searchStatus' is false (indicating failure).  This must be
-# kept synchronised with the ASN.1 for the structure described in
-# section 3.2.2.1.11 of the Z39.50 standard itself.
+# `resultSetStatus' field in the Net::Z3950::APDU::SearchResponse
+# class in cases where `searchStatus' is false (indicating failure).
+# This must be kept synchronised with the ASN.1 for the structure
+# described in section 3.2.2.1.11 of the Z39.50 standard itself.
 package Net::Z3950::ResultSetStatus;
 sub Subset  { 1 }
 sub Interim { 2 }
@@ -225,9 +224,8 @@ sub None    { 3 }
 package Net::Z3950;
 
 
-### Move to Net::Z3950::APDU.pm?
 # Define the present-status enumeration, used by the `presentStatus'
-# field in the Net::Z3950::SearchResponse class in cases where
+# field in the Net::Z3950::APDU::SearchResponse class in cases where
 # `searchStatus' is true (indicating success).  This must be kept
 # synchronised with the ASN.1 for the structure described in section
 # 3.2.2.1.11 of the Z39.50 standard itself.
@@ -241,12 +239,28 @@ sub Failure  { 5 }
 package Net::Z3950;
 
 
+# Define the scan-status enumeration, used by the `scanStatus'
+# field in the Net::Z3950::APDU::ScanResponse class.  This must be
+# kept synchronised with the ASN.1 for the structure described in
+# section 3.2.8.1.6 of the Z39.50 standard itself.
+package Net::Z3950::ScanStatus;
+sub Success  { 0 }
+sub Partial1 { 1 }
+sub Partial2 { 2 }
+sub Partial3 { 3 }
+sub Partial4 { 4 }
+sub Partial5 { 5 }
+sub Failure  { 6 }
+package Net::Z3950;
+
+
 # Include modules implementing Net::Z3950 classes
 use Net::Z3950::Manager;
 use Net::Z3950::Connection;
 use Net::Z3950::APDU;
 use Net::Z3950::ResultSet;
 use Net::Z3950::Record;
+use Net::Z3950::ScanSet;
 
 
 =head1 FUNCTIONS

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.26 2004/05/06 13:19:39 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.30 2004/05/07 16:59:21 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -15,7 +15,7 @@ Net::Z3950::Connection - Connection to a Z39.50 server, with request queue
 
 	$conn = new Net::Z3950::Connection($hostname, $port);
 	$rs = $conn->search('au=kernighan and su=unix');
-	$sr = $conn->scan('au=kernighan and su=unix', $term, $pos);
+	$sr = $conn->scan('au=kernighan and su=unix');
 	# or
 	$mgr = $conn->manager();
 	$conn = $mgr->wait();
@@ -324,6 +324,7 @@ sub _dispatch {
         $this->{scanResponse} = $apdu;
         my $which = $apdu->referenceId();
         defined $which or die "no reference Id in scan response";
+	$this->{scanSet} = _new Net::Z3950::ScanSet($this, $apdu);
         return $which;
 
     } elsif ($apdu->isa('Net::Z3950::APDU::PresentResponse')) {
@@ -573,7 +574,7 @@ sub startSearch {
 Executes a scan against the Z39.50 server to which I<$conn> is
 connected.  The scan parameters are represented by a query which is
 analysed for the term itself and the access-point in which it should
-occur.  This query can be specified in the ways as for
+occur.  This query can be specified in the same ways as for
 C<startSearch()>.
 
 =cut
@@ -606,13 +607,13 @@ sub startScan {
     # Generate the SCAN request and queue it up for subsequent dispatch
     my $errmsg = '';
     my $sr = Net::Z3950::makeScanRequest("scan",
-                                         $this->option('databaseName'),
-                                         $this->option('stepSize'),
-                                         $this->option('numberOfTermsRequested'),
-					 $this->option('preferredPositionInResponse'),
-                                         $queryType,
-                                         $value,
-                                         $errmsg);
+					 $this->option('databaseName'),
+					 $this->option('stepSize'),
+					 $this->option('numberOfEntries'),
+					 $this->option('responsePosition'),
+					 $queryType,
+					 $value,
+					 $errmsg);
     die "can't make scan request: $errmsg" if !defined $sr;
 
     $this->_enqueue($sr);
@@ -706,7 +707,7 @@ sub scan {
 	return undef;
     }
 
-    return $this->scanResponse();
+    return $this->scanSet();
 }
 
 
@@ -773,7 +774,8 @@ via the C<initResponse()> method described below.
 =item C<Net::Z3950::Op::Search>
 
 A search response was received.  The result set may be obtained via
-the C<resultSet()> method described below.
+the C<resultSet()> method described below, or the raw APDU object may
+be obtained via C<searchResponse()>.
 
 =item C<Net::Z3950::Op::Get>
 
@@ -782,8 +784,9 @@ obtained via the C<record()> method of the appropriate result set.
 
 =item C<Net::Z3950::Op::Scan>
 
-A scan response was received.  It may be obtained via the
-C<scanResponse()> method described below.
+A scan response was received.  The scan-set may be obtained via the
+C<scanSet()> method described below, or the raw APDU object may be
+obtained via C<scanResponse()>.
 
 =back
 
@@ -890,18 +893,16 @@ sub resultSet {
 }
 
 
-=head2 scanResponse()
+=head2 scanResponse(), scanSet()
 
-    if ($op == Net::Z3950::Op::Scan) {
-        $sr = $conn->scanResponse();
-    }
+	if ($op == Net::Z3950::Op::Scan) {
+		$sr = $conn->scanResponse();
+		$ss = $conn->scanSet();
 
 When a connection is known to have received a scan response, the
-response may be accessed via the connection's C<scanResponse()>.
-
-The returned structure is a C<Net::Z3950::APDU::ScanResponse> which
-can be pulled apart by inspection.  That may not be the nicest
-possible interface.
+response may be accessed via the connection's C<scanResponse()>, and
+the scan-set may be accessed via the connection's C<scanSet()>
+method.
 
 =cut
 
@@ -909,6 +910,12 @@ sub scanResponse {
     my $this = shift();
     die "not scan response" if $this->op() != Net::Z3950::Op::Scan;
     return $this->{scanResponse};
+}
+
+sub scanSet {
+    my $this = shift();
+    die "not scan response" if $this->op() != Net::Z3950::Op::Scan;
+    return $this->{scanSet};
 }
 
 

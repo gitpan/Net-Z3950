@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.16 2004/03/17 14:13:06 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.17 2004/05/07 15:43:22 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -645,8 +645,8 @@ sub delete {
 
 =head2 errcode(), addinfo(), errmsg()
 
-	if (!defined $rs->record($n)) {
-		print "error number: ", $rs->errcode(), "\n";
+	if (!defined $rs->record($i)) {
+		print "error ", $rs->errcode(), " (", $rs->errmsg(), ")\n";
 		print "additional info: ", $rs->addinfo(), "\n";
 	}
 

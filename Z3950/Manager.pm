@@ -1,4 +1,4 @@
-# $Id: Manager.pm,v 1.23 2004/05/06 13:14:14 mike Exp $
+# $Id: Manager.pm,v 1.24 2004/05/07 15:40:47 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -169,11 +169,9 @@ sub _default {
     return "GRS-1" if $type eq 'preferredRecordSyntax';
 
     # Used in Net::Z3950::Connection::startScan()
-    ### Option names should be made ZOOM-friendly
-    ### Options should be documented
-    return 1 if $type eq 'preferredPositionInResponse';
+    return 1 if $type eq 'responsePosition';
     return 0 if $type eq 'stepSize';
-    return 20 if $type eq 'numberOfTermsRequested';
+    return 20 if $type eq 'numberOfEntries';
 
     # Used in Net::Z3950::ResultSet::makePresentRequest()
     return 'B' if $type eq 'elementSetName';

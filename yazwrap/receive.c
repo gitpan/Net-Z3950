@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.15 2004/05/06 13:12:48 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.16 2004/05/06 15:42:00 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -423,6 +423,16 @@ static SV *translateListEntries(Z_ListEntries *x, int *isErrorp) {
      * that if there are diagnostics we return them, otherwise the
      * entries.  We further simplify by returning only the first
      * diagnostic if there are several.
+     *
+     *	### This fails badly with the following scan:
+     *		ruslan.ru:210/spstu
+     *		@attr 1=21 fruit
+     *	The response contains a set of entries _and_ multiple NSDs.
+     *	This is because ruslan is a union catalogue of several
+     *	database, some of which support scan on subject and some of
+     *	which don't.  The former supply terms, and the latter each
+     *	supply a diagnostic.  We need to change the structure we
+     *	return.
      *
      * The entries object is represented as a reference to a blessed
      * array of elements

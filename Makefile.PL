@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.10 2003/12/19 16:01:03 mike Exp $
+# $Id: Makefile.PL,v 1.11 2004/05/07 17:00:29 mike Exp $
 
 # If you want to build this module against a YAZ build that's not been
 # installed in one of the usual places, just give a full path to where
