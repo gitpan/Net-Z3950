@@ -1,4 +1,4 @@
-$Header: /home/cvsroot/NetZ3950/README,v 1.10 2003/04/03 09:09:35 mike Exp $
+$Header: /home/cvsroot/NetZ3950/README,v 1.11 2003/05/06 14:12:04 mike Exp $
 
 Net::Z3950.pm -- What Is It?
 ----------------------------
@@ -41,12 +41,6 @@ prerequisites to building the Net::Z3950 module:
 	toolkit, a set of C routines for manipulating, sending and
 	receiving the Z39.50 data structures.  You can find it at
 	http://indexdata.dk/yaz/
-
-	I'm assuming that you've installed Yaz in the default places
-	-- binaries in /usr/local/bin, libraries in /usr/local/lib,
-	etc.  If you've installed it somewhere else, then you'll have
-	to modify the LIBS and INC settings in ./Makefile.PL and the
-	INC setting in yazwrap/Makefile.PL.
 
     3.	The third dependency is an optional one, on the MARC module.
 	This is required by the Net::Z3950::Record::MARC class's

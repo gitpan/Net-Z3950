@@ -1,4 +1,10 @@
-# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.3 2003/02/04 16:11:38 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.6 2003/05/09 10:33:23 mike Exp $
+
+my $yazinc = `yaz-config --cflags`;
+my $yazlibs = `yaz-config --libs`;
+if (!$yazinc || !$yazlibs) {
+    die "ERROR: Unable to call script 'yaz-config': is YAZ installed?";
+}
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -6,11 +12,11 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'	=> 'Net::Z3950',
     'VERSION_FROM' => 'Z3950.pm', # finds $VERSION
-#   'LIBS'	=> ['-L/usr/local/src/yaz/lib/.libs -lyaz'],   # e.g., '-lm' 
-    'LIBS'	=> ['-lyaz'],   # e.g., '-lm' 
+    'LIBS'	=> [ $yazlibs ],   # e.g., '-lm' 
     'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING' 
-#	Some machines like to be told:  'DEFINE' => '-D_GNU_SOURCE'
-#   'INC'	=> '-I/usr/local/src/yaz/include',
+#	Some systems like to be told:  'DEFINE' => '-D_GNU_SOURCE'
+#	Apparently RedHat 8.0 (but NOT 7.3) is one of these.
+    'INC'	=> $yazinc,
     'PREREQ_PM' => { Event => 0.77 },
     'MYEXTLIB'	=> 'yazwrap/libyazwrap$(LIB_EXT)',
     'AUTHOR'    => 'Mike Taylor <mike@perl.z3950.org>',
@@ -27,8 +33,10 @@ WriteMakefile(
 #	the world.
 #
 sub MY::postamble {
-'
-$(MYEXTLIB): yazwrap/Makefile
-	cd yazwrap && $(MAKE) $(PASTHRU)
-';
+    '$(MYEXTLIB): yazwrap/Makefile
+	cd yazwrap && $(MAKE) $(PASTHRU)';
+}
+
+sub MY::post_constants {
+    'PASTHRU_INC=$(INC)'
 }

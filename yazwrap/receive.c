@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.9 2002/07/19 15:44:16 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.10 2003/05/07 10:10:00 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -512,6 +512,7 @@ static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 	{ VAL_TEXT_XML,		"Net::Z3950::Record::XML" },
 	{ VAL_APPLICATION_XML,	"Net::Z3950::Record::XML" },
 	{ VAL_OPAC,		"Net::Z3950::Record::OPAC" },
+	{ VAL_MAB,              "Net::Z3950::Record::MAB" },
 	{ VAL_NOP }		/* end marker */
 	/* ### etc. */
     };

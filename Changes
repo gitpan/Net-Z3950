@@ -1,6 +1,24 @@
-f$Header: /home/cvsroot/NetZ3950/Changes,v 1.29 2003/04/03 09:10:55 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.35 2003/05/12 09:20:49 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.34  Mon May 12 10:17:07 2003
+	- Slightly more robust cleanup in Manager::forget()
+	- Make samples/simple.pl a little less simple(!) by making a
+	  manager so that pre-connection options such as
+	  authentication parameters can be set.
+	- In Makefile.PL, LIBS and INC are now both set via yaz-config,
+	  so you don't need to mess with that file before building.
+	  (Adam Dickmeiss)
+	- The INC is now inherited by yazwrap/Makefile.PL, so that
+	  this file also does not need to be edited.  (Adam Dickmeiss)
+	- CCFLAGS is no longer set in the yazwrap directory.  I only
+	  did that in order to add "-Wall", which is pleasant luxury
+	  but not really necessary; and doing so caused problems as
+	  other, default, components of that setting were discarded on
+	  some platforms.  (Adam Dickmeiss)
+	- Add support for the MAB record syntax, thanks to Heiko
+	  Jansen <JANSEN@hbz-nrw.de>
 
 0.33  Thu Apr  3 09:10:16 2003
 	- Add explicit statement of GPL licence.
@@ -263,4 +281,4 @@ To be done:
 	- ### Make managers drop references to closed connections.
 	- ### Make $mgr->wait() finish when there are no connections left.
 	- ### Add optional timeout parameter to $mgr->wait()
-	- ### Add GPL.
+

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.7 2002/07/26 12:21:10 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.8 2003/05/02 09:17:36 mike Exp $
 
 use Net::Z3950;
 use strict;
@@ -11,15 +11,16 @@ my $host = shift();
 my $port = shift();
 my $db = shift();
 my $query = shift();
-my $conn = new Net::Z3950::Connection($host, $port, databaseName => $db)
-    or die "can't connect: $!";
-
-$conn->option(preferredRecordSyntax => Net::Z3950::RecordSyntax::USMARC);
+my $mgr = new Net::Z3950::Manager();
+$mgr->option(preferredRecordSyntax => Net::Z3950::RecordSyntax::USMARC);
 while (@ARGV) {
     my $type = shift();
     my $val = shift();
-    $conn->option($type, $val);
+    $mgr->option($type, $val);
 }
+
+my $conn = new Net::Z3950::Connection($mgr, $host, $port, databaseName => $db)
+    or die "can't connect: $!";
 
 my $rs = $conn->search($query)
     or die $conn->errmsg();

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.8 2002/07/19 15:44:16 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.9 2003/05/07 10:10:00 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -292,7 +292,7 @@ sub FinalFragment        { 5 }
 package Net::Z3950;
 
 
-=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC, Net::Z3950::APDU::UNIMARC, Net::Z3950::APDU::OPAC
+=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC, Net::Z3950::APDU::UNIMARC, Net::Z3950::APDU::OPAC, Net::Z3950::APDU::MAB
 
 No methods - just treat as an opaque chunk of data.
 
@@ -306,6 +306,7 @@ package Net::Z3950::APDU::LIBRISMARC;
 package Net::Z3950::APDU::DANMARC;
 package Net::Z3950::APDU::UNIMARC;
 package Net::Z3950::APDU::OPAC;
+package Net::Z3950::APDU::MAB;
 
 
 =head2 Net::Z3950::APDU::GRS1

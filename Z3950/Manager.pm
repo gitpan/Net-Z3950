@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.7 2002/10/08 16:18:12 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.8 2003/05/02 09:15:47 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -279,7 +279,8 @@ sub forget {
 
     my $n = $this->connections();
     for (my $i = 0; $i < $n; $i++) {
-	next if $this->{connections}->[$i] ne $conn;
+	next if (!defined $this->{connections}->[$i] ||
+		 $this->{connections}->[$i] ne $conn);
 	# warn "forgetting connection $i of $n";
 	splice @{ $this->{connections} }, $i, 1;
 	return;

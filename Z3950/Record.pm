@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.8 2002/02/28 07:23:07 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.9 2003/05/07 10:10:00 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -353,6 +353,55 @@ sub nfields {
 
 sub render {
     return "[can't render a Net::Z3950::Record::OPAC - not yet implemented]\n";
+}
+
+sub rawdata {
+    my $this = shift();
+    return $$this;
+}
+
+
+=head2 Net::Z3950::Record::MAB
+
+Represents a record using the MAB record syntax (Maschinelles
+Austauschformat fuer Bibliotheken, ftp://ftp.ddb.de/pub/mab/); an
+interchange format defined by Die Deutsche Bibliothek (German National
+Library).
+
+=cut
+
+package Net::Z3950::Record::MAB;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::Record);
+
+sub nfields {
+    my $this = shift();
+    return $$this =~ tr/\x1E/\x1E/;
+}
+
+sub render {
+    my $this = shift();
+    my $in = $$this;
+
+    # Chop off 24-character preface
+    my $out = "### " . substr($in, 0, 24) . "\n";
+    $in = substr($in, 24);
+
+    # \x1D is the record separator: discard it
+    $in =~ s/\x1D$//;
+
+    # \x1E is the field separator
+    my @fields = split /\x1E/, $in;
+
+    foreach my $field (@fields) {
+	# If a database uses two $ instead of the correct subfield
+	# separator code \x1F we reset this.
+	$field =~ s/\$\$/\x1F/g;
+	$field =~ s/\x1F/\$/g;
+	$out .= "$field\n";
+    }
+
+    return $out;
 }
 
 sub rawdata {
