@@ -12,6 +12,8 @@ WriteMakefile(
 #   'INC'	=> '-I/usr/local/src/yaz/include',
     'PREREQ_PM' => { Event => 0.77 },
     'MYEXTLIB'	=> 'yazwrap/libyazwrap$(LIB_EXT)',
+    'AUTHOR'    => 'Mike Taylor <mike@perl.z3950.org>',
+    'ABSTRACT'  => 'Build clients for the Z39.50 info. retrieval protocol',
 );
 
 

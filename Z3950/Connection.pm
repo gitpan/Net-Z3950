@@ -164,7 +164,8 @@ sub new {
     $mgr->_register($this);
 
     if ($this->option('mode') ne 'async') {
-	$this->expect(Net::Z3950::Op::Init, "init");
+	$this->expect(Net::Z3950::Op::Init, "init")
+	    or return undef;	# e.g. ECONNREFUSED
     }
 
     return $this;
@@ -172,6 +173,11 @@ sub new {
 
 
 # PRIVATE to the new() method, invoked as an Event->io callback
+#
+# So far as I can tell from the Event.pm documentation, and a cursory
+# reading of the rather opaque source code, it appears that the return
+# value of callbacks such as this one is ignored.
+#
 sub _ready_to_read {
     my($event) = @_;
     my $watcher = $event->w();
@@ -186,16 +192,20 @@ sub _ready_to_read {
     my $apdu = Net::Z3950::decodeAPDU($conn->{cs}, $reason);
     if (defined $apdu) {
 	my $refId = $conn->_dispatch($apdu);
-	if (defined $refId) {
-	    my $cb = $conn->{refId2cb}->{$refId};
-	    #warn ref($apdu). ": refId='$refId', cb='$cb'";
-	    if (defined $cb) {
-		&$cb($conn, $apdu);
-	    } else {
-		Event::unloop($conn);
-	    }
+	if (!defined $refId) {
+	    # Unrecognised APDU -- nothing useful to do here, unless
+	    # we think die()ing might be helpful?
+	    return;
 	}
 
+	my $cb = $conn->{refId2cb}->{$refId};
+	#warn ref($apdu). ": refId='$refId', cb='$cb'";
+	if (defined $cb) {
+	    # Application-level callback provided by caller
+	    &$cb($conn, $apdu);
+	} else {
+	    Event::unloop($conn);
+	}
 	return;
     }
 
@@ -517,7 +527,7 @@ sub search {
 # code.  Used to implement synchronous operations on top of async
 # ones: waits for something to happen on $conn's manager, checks that
 # the event is on the right connection, and is the expected kind of
-# operation.
+# operation.  Return 1 or undef for success or failure.
 #
 sub expect {
     my $this = shift();

@@ -2,6 +2,17 @@ $Header: /home/cvsroot/NetZ3950/Changes,v 1.16 2002/01/29 15:47:46 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
 
+0.26  Fri Feb  8 16:06:15 2002
+	- OK.  This time I have _really_ fixed connecting to work
+	  properly either synchronously or asynchronously, and
+	  slightly clarified some of the event-handling code while I
+	  was at it.  In particular, ECONNREFUSED is handled properly
+	  now.
+	- Add AUTHOR and ABSTRACT to my Makefile.PL, as recommended in
+	  passing by R. Geoffrey Avery's Lightning Talk _h2xs has
+	  eXceeded its Stay_, at
+	  http://www.platypiventures.com/perl/present/tpc5modules/004.html
+
 0.25  Tue Jan 29 15:56:48 2002
 	- Remove some obsolete comments (documenting bugs that are now
 	  fixed!)
