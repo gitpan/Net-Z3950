@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.2 2002/02/08 17:41:20 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Makefile.PL,v 1.3 2003/02/04 16:11:38 mike Exp $
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -9,6 +9,7 @@ WriteMakefile(
 #   'LIBS'	=> ['-L/usr/local/src/yaz/lib/.libs -lyaz'],   # e.g., '-lm' 
     'LIBS'	=> ['-lyaz'],   # e.g., '-lm' 
     'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING' 
+#	Some machines like to be told:  'DEFINE' => '-D_GNU_SOURCE'
 #   'INC'	=> '-I/usr/local/src/yaz/include',
     'PREREQ_PM' => { Event => 0.77 },
     'MYEXTLIB'	=> 'yazwrap/libyazwrap$(LIB_EXT)',

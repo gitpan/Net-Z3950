@@ -1,4 +1,4 @@
-$Header: /home/cvsroot/NetZ3950/README,v 1.9 2003/01/21 16:46:41 mike Exp $
+$Header: /home/cvsroot/NetZ3950/README,v 1.10 2003/04/03 09:09:35 mike Exp $
 
 Net::Z3950.pm -- What Is It?
 ----------------------------
@@ -10,13 +10,20 @@ geo-spatial mapping, museums and other cultural heritage information,
 and structured vocabulary navigation.
 
 Up to date information on this module can be found at
-http://perl.z3950.org/
+	http://perl.z3950.org/
+
+The Net::Z3950 module is free software, as described at
+	http://www.fsf.org/philosophy/free-sw.html
+It is made available under the GNU General Public Licence, version 2:
+see the file COPYING for details.  (This is made explicit as of
+release 0.33, but it was always the intention.)
 
 Net::Z3950.pm is an implementation of the Perl binding for ZOOM, the
-Z39.50 Objct Orientation Model.  Bindings for the same abstract API
-are, or will be, available in other languages including C, C++, Java
-and Tcl.  There's more about ZOOM, including the specification, at
-http://zoom.z3950.org/
+Z39.50 Obejct Orientation Model.  Bindings for the same abstract API
+are available in other languages including C, C++, Java, Tcl, Visual
+Basic, Python and Scheme.  There's more about ZOOM, including the
+specification, at
+	http://zoom.z3950.org/
 
 
 Building and Installation
@@ -66,22 +73,22 @@ POD documents, and start reading at doc/index.html.
 Support
 -------
 
-
 Informal support is available directly from the author (see below) but
 since ``you get what you pay for'' and I'm doing it for free, there
 are of course no guarantees!
 
 In general a better option is to join the Net::Z3950 mailing list at
-http://www.indexdata.dk/mailman/listinfo/net-z3950, and discuss in
-that forum any problems you may encounter.  I read this list, so I
-will see your messages; but you may get better help from others who
-have run into similar difficulties.
+	http://www.indexdata.dk/mailman/listinfo/net-z3950
+and discuss in that forum any problems you may encounter.  I read this
+list, so I will see your messages; but you may get better help from
+others who have run into similar difficulties.
 
 For those who require it, it's possible to buy professional,
 commercial support for this module, with well-defined support levels
 and response times, from Index Data, in collaboration with whom I
-wrote this module.  See http://perl.z3950.org/support/contract.html or
-email <info@indexdata.dk> for details.
+wrote this module.  See
+	http://perl.z3950.org/support/contract.html
+or email <info@indexdata.dk> for details.
 
 
 Author

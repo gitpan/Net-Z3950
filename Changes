@@ -1,6 +1,10 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.28 2003/01/21 16:50:14 mike Exp $
+f$Header: /home/cvsroot/NetZ3950/Changes,v 1.29 2003/04/03 09:10:55 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.33  Thu Apr  3 09:10:16 2003
+	- Add explicit statement of GPL licence.
+	  No code changes at all.
 
 0.32  Tue Jan 21 16:46:23 2003
 	- Remove the old, unnecessary and confusing code that patched
