@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.13 2003/09/12 14:34:51 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.14 2003/09/13 21:21:47 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -609,9 +609,6 @@ static SV *translateHoldingsAndCirc(Z_HoldingsAndCircData *x)
     for (i = 0; i < x->num_circulationData; i++)
 	av_push(av, translateCircRecord(x->circulationData[i]));
     setMember(hv, "circulationData", sv2);
-
-    Z_Volume **volumes;
-    Z_CircRecord **circulationData;
 
     return sv;
 }

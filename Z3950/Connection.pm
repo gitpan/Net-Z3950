@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.20 2003/09/12 22:31:30 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.21 2003/09/16 13:28:14 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -228,8 +228,14 @@ sub _ready_to_read {
     }
 
     if ($reason == Net::Z3950::Reason::EOF) {
+	$conn->{errcode} = 100; # "Unknown error" is pathetic
+	$conn->{addinfo} = "server $addr rudely closed connection";
+	# The "errcode" and "addinfo" are currently not used on Init
+	# failure, which is the only time this is known to happen,
+	# with the server at webcat.camosun.bc.ca:2200/unicorn, so we
+	# also set $!, which is what is supposed to be consulted then.
+	$! = 104;		# ECONNRESET on Linux 2.4.18 ### YMMV
 	$watcher->cancel();
-	die "[$addr] EOF from server (server closed connection?)\n";
 
     } elsif ($reason == Net::Z3950::Reason::Incomplete) {
 	# Some bytes have been read into the COMSTACK (which maintains

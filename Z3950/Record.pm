@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.11 2003/09/06 01:22:24 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.12 2003/09/16 14:12:37 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -356,19 +356,60 @@ sub render {
     my $res;
     my $bib = $this->{bibliographicRecord};
     if (defined $bib) {
-	$res = $bib->render();
+	$res = "* Bibliographic record:\n";
+	$res .= $bib->render();
     } else {
 	$res = "[no bibliographic record]\n";
     }
 
-    $res .= $this->{num_holdingsData} . " holdings records:\n";
+    my $n = $this->{num_holdingsData};
     my $h = $this->{holdingsData};
-    foreach my $hr (@$h) {
-	use Data::Dumper;
-	$res .= " - $hr = " . Dumper($hr) . "\n";
+    foreach my $i (1 .. $n) {
+	my $hr = $h->[$i-1];
+	$res .= "* Holdings record $i of $n:\n";
+	foreach my $label (qw(typeOfRecord encodingLevel format
+			      receiptAcqStatus generalRetention
+			      completeness dateOfReport nucCode
+			      localLocation shelvingLocation
+			      callNumber shelvingData copyNumber
+			      publicNote reproductionNote
+			      termsUseRepro enumAndChron)) {
+	    $res .= _maybeValue(1, $hr, $label);
+	}
+	
+	my $cd = $hr->{circulationData};
+	my $n = @$cd;
+	foreach my $i (1 .. $n) {
+	    my $cr = $cd->[$i-1];
+	    $res .= "\t* Circulation record $i of $n:\n";
+	    foreach my $label (qw(availableNow availablityDate
+				  availableThru restrictions itemId
+				  renewable onHold enumAndChron
+				  midspine temporaryLocation)) {
+		$res .= _maybeValue(2, $cr, $label);
+	    }
+	}
+
+	my $vols = $hr->{volumes};
+	$n = @$vols;
+	foreach my $i (1 .. $n) {
+	    my $vol = $vols->[$i-1];
+	    $res .= "\t* Volume record $i of $n:\n";
+	    foreach my $label (qw(enumeration chronology
+				  enumAndChron)) {
+		$res .= _maybeValue(2, $vol, $label);
+	    }
+	}
     }
 
     return $res;
+}
+
+sub _maybeValue {
+    my($level, $hr, $label) = @_;
+
+    my $val =  $hr->{$label};
+    return defined $val ? ("\t" x $level . "$label: $val\n") : "";
 }
 
 sub rawdata {
