@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.1.1.1 2001/02/12 10:53:54 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.2 2001/10/12 15:16:13 mike Exp $ */
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -134,7 +134,7 @@ diagbib1_str(errcode)
 	int errcode
 
 databuf
-makeInitRequest(referenceId, preferredMessageSize, maximumRecordSize, user, password, groupid, implementationId, implementationName, implementationVersion)
+makeInitRequest(referenceId, preferredMessageSize, maximumRecordSize, user, password, groupid, implementationId, implementationName, implementationVersion, errmsg)
 	databuf referenceId
 	int preferredMessageSize
 	int maximumRecordSize
@@ -144,9 +144,12 @@ makeInitRequest(referenceId, preferredMessageSize, maximumRecordSize, user, pass
 	mnchar *implementationId
 	mnchar *implementationName
 	mnchar *implementationVersion
+	char *&errmsg
+	OUTPUT:
+	errmsg
 
 databuf
-makeSearchRequest(referenceId, smallSetUpperBound, largeSetLowerBound, mediumSetPresentNumber, resultSetName, databaseName, smallSetElementSetName, mediumSetElementSetName, preferredRecordSyntax, queryType, query)
+makeSearchRequest(referenceId, smallSetUpperBound, largeSetLowerBound, mediumSetPresentNumber, resultSetName, databaseName, smallSetElementSetName, mediumSetElementSetName, preferredRecordSyntax, queryType, query, errmsg)
 	databuf referenceId
 	int smallSetUpperBound
 	int largeSetLowerBound
@@ -158,15 +161,21 @@ makeSearchRequest(referenceId, smallSetUpperBound, largeSetLowerBound, mediumSet
 	int preferredRecordSyntax
 	int queryType
 	char *query
+	char *&errmsg
+	OUTPUT:
+	errmsg
 
 databuf
-makePresentRequest(referenceId, resultSetId, resultSetStartPoint, numberOfRecordsRequested, elementSetName, preferredRecordSyntax)
+makePresentRequest(referenceId, resultSetId, resultSetStartPoint, numberOfRecordsRequested, elementSetName, preferredRecordSyntax, errmsg)
 	databuf referenceId
 	char *resultSetId
 	int resultSetStartPoint
 	int numberOfRecordsRequested
 	char *elementSetName
 	int preferredRecordSyntax
+	char *&errmsg
+	OUTPUT:
+	errmsg
 
 SV *
 decodeAPDU(cs, reason)

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.2 2001/07/18 12:20:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.3 2001/10/12 15:16:13 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -227,7 +227,7 @@ sub FinalFragment        { 5 }
 package Net::Z3950;
 
 
-=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC
+=head2 Net::Z3950::APDU::SUTRS, Net::Z3950::APDU::USMARC, Net::Z3950::APDU::UKMARC, Net::Z3950::APDU::NORMARC, Net::Z3950::APDU::LIBRISMARC, Net::Z3950::APDU::DANMARC, Net::Z3950::APDU::UNIMARC
 
 No methods - just treat as a string.
 
@@ -239,6 +239,7 @@ package Net::Z3950::APDU::UKMARC;
 package Net::Z3950::APDU::NORMARC;
 package Net::Z3950::APDU::LIBRISMARC;
 package Net::Z3950::APDU::DANMARC;
+package Net::Z3950::APDU::UNIMARC;
 
 
 =head2 Net::Z3950::APDU::GRS1

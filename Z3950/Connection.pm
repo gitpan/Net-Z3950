@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.2 2001/10/12 15:16:13 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -46,8 +46,8 @@ I<$mgr>, to the server on the specified I<$host> and I<$port>.  If the
 I<$port> argument is omitted, the C<z3950> service is used; if this is
 not defined, port 210 is used.
 
-The manager argument may be C<undef>, or may be omitted completely; in
-either case, the connection is created under the control of a
+The manager argument may be omitted, in which
+case, the connection is created under the control of a
 ``default manager'', a reference to which may be subsequently
 retrieved with the C<manager()> method.  Multiple connections made
 with no explicitly-specified manager in this way will all share the
@@ -62,6 +62,8 @@ trying to do so.  (In the latter case, error information is stored in
 the manager structure.)  If the connection is asynchronous, then the
 new object is created and returned before the connection is forged;
 this will happen in parallel with subsequent actions.
+
+I<This is a lie: connecting is always done synchronously.>
 
 Any of the standard options (including synchronous or asynchronous
 mode) may be specified as additional arguments.  Specifically:
@@ -103,12 +105,16 @@ sub new {
 	$mgr = $_default_manager;
     }
 
+    my $cb;
+    $cb = shift() if ref $_[0] eq 'CODE';
+
     my $this = bless {
 	mgr => $mgr,
 	host => $host,
 	port => $port,
 	resultSets => [],
 	options => { @_ },
+	refId2cb => {},		# maps reference IDs to callback functions
     }, $class;
 
     ###	It would be nice if we could find a way to do the DNS lookups
@@ -140,7 +146,8 @@ sub new {
 	or die "can't make idle-watcher on socket to $addr";
 
     # Generate the INIT request and queue it up for subsequent dispatch
-    my $ir = Net::Z3950::makeInitRequest(undef, # No reference Id needed
+    my $errmsg = '';
+    my $ir = Net::Z3950::makeInitRequest('init',
 				    $this->option('preferredMessageSize'),
 				    $this->option('maximumRecordSize'),
 				    $this->option('user'),
@@ -148,11 +155,18 @@ sub new {
 				    $this->option('groupid'),
 				    $this->option('implementationId'),
 				    $this->option('implementationName'),
-				    $this->option('implementationVersion'));
-    die "can't make init request" if !defined $ir;
+				    $this->option('implementationVersion'),
+				    $errmsg);
+    die "can't make init request: $errmsg" if !defined $ir;
 
     $this->_enqueue($ir);
+    $this->{refId2cb}->{'init'} = $cb if defined $cb;
     $mgr->_register($this);
+
+    if ($this->option('mode') ne 'async') {
+	$this->expect(Net::Z3950::Op::Init, "init");
+    }
+
     return $this;
 }
 
@@ -171,7 +185,17 @@ sub _ready_to_read {
 				# parameter to decodeAPDU()
     my $apdu = Net::Z3950::decodeAPDU($conn->{cs}, $reason);
     if (defined $apdu) {
-	$conn->_dispatch($apdu);
+	my $refId = $conn->_dispatch($apdu);
+	if (defined $refId) {
+	    my $cb = $conn->{refId2cb}->{$refId};
+	    #warn ref($apdu). ": refId='$refId', cb='$cb'";
+	    if (defined $cb) {
+		&$cb($conn, $apdu);
+	    } else {
+		Event::unloop($conn);
+	    }
+	}
+
 	return;
     }
 
@@ -205,6 +229,9 @@ sub _ready_to_read {
 
 
 # PRIVATE to the _ready_to_read() function
+#
+# Return referenceId of returned APDU or undef if unsupported.
+#
 sub _dispatch {
     my $this = shift();
     my($apdu) = @_;
@@ -212,7 +239,7 @@ sub _dispatch {
     if ($apdu->isa('Net::Z3950::APDU::InitResponse')) {
 	$this->{op} = Net::Z3950::Op::Init;
 	$this->{initResponse} = $apdu;
-        Event::unloop($this);
+	return $apdu->referenceId();
 
     } elsif ($apdu->isa('Net::Z3950::APDU::SearchResponse')) {
 	$this->{op} = Net::Z3950::Op::Search;
@@ -224,7 +251,7 @@ sub _dispatch {
 	$rs = _new Net::Z3950::ResultSet($this, $which, $apdu);
 	$this->{resultSets}->[$which] = $rs;
 	$this->{resultSet} = $rs;
-        Event::unloop($this);
+	return $which;
 
     } elsif ($apdu->isa('Net::Z3950::APDU::PresentResponse')) {
 	$this->{op} = Net::Z3950::Op::Get;
@@ -238,10 +265,11 @@ sub _dispatch {
 	    or die "reference to non-existent result set";
 	$rs->_add_records($apdu);
 	$this->{resultSet} = $rs;
-        Event::unloop($this);
+	return $apdu->referenceId();
 
     } else {
 	print "unsupported APDU [$apdu] ignored\n";
+	return undef;
     }
 }
 
@@ -397,6 +425,7 @@ sub startSearch {
     my($type, $value);
 
     if (ref $query) {
+	### Huh?  We don't actually have a *::Query type!
 	$type = $query->type();
 	$value = $query->value();
     } else {
@@ -417,6 +446,7 @@ sub startSearch {
     # Generate the SEARCH request and queue it up for subsequent dispatch
     my $rss = $this->{resultSets};
     my $nrss = @$rss;
+    my $errmsg = '';
     my $sr = Net::Z3950::makeSearchRequest($nrss,
 				      $this->option('smallSetUpperBound'),
 				      $this->option('largeSetLowerBound'),
@@ -426,11 +456,16 @@ sub startSearch {
 				      $this->option('smallSetElementSetName'),
 				      $this->option('mediumSetElementSetName'),
 				      $this->option('preferredRecordSyntax'),
-				      $queryType, $value);
-    die "can't make search request" if !defined $sr;
+				      $queryType, $value, $errmsg);
+    die "can't make search request: $errmsg" if !defined $sr;
     $rss->[$nrss] = 0;		# placeholder
 
     $this->_enqueue($sr);
+
+    # Callback for asynchronous notification
+    my $cb = shift();
+    #warn "startSearch: cb='$cb'";
+    $this->{refId2cb}->{$nrss} = $cb if defined $cb;
 }
 
 
@@ -459,48 +494,56 @@ arguments as C<startSearch()>
 #	an operations or starts and finishes it, depending on whether
 #	we're in async or synchronous mode.  Maybe in the same way, we
 #	should have a single search() method here, which behaves like
-#	startSearch() when used on an asynchronous connection.
+#	startSearch() when used on an asynchronous connection.  More
+#	likely, it's the fetch interface that's broken, and should
+#	have separate sync and async methods, so that we can discard
+#	the notion of a mode completely.
 #
 sub search {
     my $this = shift();
 
-    my $conn = $this->manager()->wait();
-    if ($conn != $this) {
-	#   ###	We would prefer just to ignore any events on
-	#	connections other than this one, but there doesn't
-	#	seem to be a way to do this (unless we invent one);
-	#	so, for now, you shouldn't mix synchronous and
-	#	asynchronous calls unless the async ones nominate a
-	#	callback (which they can't yet do)
-	die "single-plexing wait() returned wrong connection!";
-    }
-
-    if ($this->op == Net::Z3950::Op::Error) {
-	# Error code and addinfo are already available from $this
+    $this->startSearch(@_);
+    if (!$this->expect(Net::Z3950::Op::Search, "search")) {
 	return undef;
     }
-
-    ###	Huh?  Why do we always expect an initResponse?  This is surely
-    #	a nonsense: what about the second and subsequent calls to
-    #	search()?
-    if ($this->op() != Net::Z3950::Op::Init) {
-	#   ###	Again, we'd like to ignore this event, but there's no
-	#	way to do it, so this has to be a fatal error.
-	die "single-plexing wait() fired wrong op (expected init)";
-    }
-
-    $this->startSearch(@_);
-    $conn = $this->manager()->wait();
-    die "single-plexing wait() returned wrong connection!"
-	if $conn != $this;
-    return undef
-	if $this->op == Net::Z3950::Op::Error;
-    die "single-plexing wait() fired wrong op (expected search)"
-	if $this->op() != Net::Z3950::Op::Search;
 
     # We've established that the event was a search response on $this, so:
     return $this->resultSet();
 }
+
+
+# Private method, shared with ResultSet.pm but not available to client
+# code.  Used to implement synchronous operations on top of async
+# ones: waits for something to happen on $conn's manager, checks that
+# the event is on the right connection, and is the expected kind of
+# operation.
+#
+sub expect {
+    my $this = shift();
+    my($op, $opname) = @_;
+
+    my $conn = $this->manager()->wait();
+    ###	We would prefer just to ignore any events on connections other
+    #	than this one, but there isn't a way to do this (unless we
+    #	invent one, storing other-connection events until they're
+    #	requested); so, for now, you shouldn't mix synchronous and
+    #	asynchronous calls unless the async ones nominate a callback.
+    die "expect() returned wrong connection!"
+	if $conn != $this;
+
+    # Error code and addinfo are already available from $this
+    return undef
+	if $this->op == Net::Z3950::Op::Error;
+
+    ###	Again, we'd like to ignore this event, leaving it lying around
+    #	for later; but there's no way to do it, so this has to be a
+    #	fatal error.
+    die "expect() got wrong op (expected $opname)"
+	if $this->op() != $op;
+
+    return 1;
+}
+
 
 
 =head2 op()
@@ -550,7 +593,7 @@ sub op {
 }
 
 
-=head2 errcode(), addinfo(), errop()
+=head2 errcode(), addinfo(), errop(), errmsg()
 
 	if ($conn->op() == Net::Z3950::Op::Error) {
 		print "error number: ", $conn->errcode(), "\n";
@@ -567,18 +610,13 @@ occurred via the C<errop()> method.  (The error operation returned
 takes one of the values that may be returned from the C<op()> method.)
 
 As a convenience, C<$conn->errmsg()> is equivalent to
-C<Net::Z3950::diagbib1_str($conn->errcode())>.
+C<Net::Z3950::errstr($conn->errcode())>.
 
 =cut
 
 sub errcode {
     my $this = shift();
     return $this->{errcode};
-}
-
-sub errmsg {
-    my $this = shift();
-    return Net::Z3950::diagbib1_str($this->errcode());
 }
 
 sub addinfo {
@@ -589,6 +627,11 @@ sub addinfo {
 sub errop {
     my $this = shift();
     return $this->{errop};
+}
+
+sub errmsg {
+    my $this = shift();
+    return Net::Z3950::errstr($this->errcode());
 }
 
 
@@ -652,31 +695,19 @@ sub resultSets {
 }
 
 
-=head2 records()
+=head2 name()
 
-	if ($op == Net::Z3950::Op::Get) {
-		@recs = $conn->records();
+	print $conn->name();
 
-When a connection is known to have some result-set records available,
-they may be accessed via the connection's C<records()> method, which
-returns an array of zero or more C<Net::Z3950::Record> references.
-
-Zero records are only returned if there are no more records on the
-server satisfying the C<get()> requests that have been made on the
-appropriate result set associated with I<$conn>.
-
-I<### What happens if the client issues several sets of C<get>
-requests on the same result set, and those requests can only be
-satisfied by repeated PRESENT requests?  This is unclear, and suggests
-that the interface needs rethinking.  Perhaps we need a method to
-return a reference to a particular result set for which records have
-arrived?  Watch this space ...>
+Returns a short string which can be used as the connection's "name" in
+text output.
 
 =cut
 
-sub records {
+sub name {
     my $this = shift();
-    die "### Net::Z3950::Connection->records() not yet implemented";
+
+    return $this->{host} . ':' . $this->{port};
 }
 
 

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.5 2001/07/18 12:26:26 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950.pm,v 1.7 2001/10/12 15:29:17 mike Exp $
 
 package Net::Z3950;
 
@@ -63,6 +63,11 @@ used in application domains as diverse as bibliographic information,
 geo-spatial mapping, museums and other cultural heritage information,
 and structured vocabulary navigation.
 
+C<Net::Z3950.pm> is an implementation of the Perl binding for ZOOM, the
+Z39.50 Objct Orientation Model.  Bindings for the same abstract API
+are, or will be, available in other languages including C, C++, Java
+and Tcl.
+
 Two basic approaches are possible to building clients with this
 module:
 
@@ -90,10 +95,10 @@ layer on top of the asynchronous functions.)
 =head1 ASYNCHRONOUS SYNOPSIS
 
 (This code does not block in reads, and so is suitable for broadcast
-clients which search multiple servers simultaneously: see below for
+clients which search multiple servers simultaneously: see above for
 simpler sample code that blocks in reads.)
 
-	### No point filling this in until we have it working.
+I<### To be written>
 
 =cut
 
@@ -162,7 +167,7 @@ sub CCL2RPN { 39503 }		# Convert CCL to RPN (type-1) locally
 package Net::Z3950;
 
 
-### Move to Net::Z3950::APDU.pm?
+### Move to Net::Z3950::APDU.pm?  Not currently used anyway
 # Define the result-set-status enumeration, used by the
 # `resultSetStatus' field in the Net::Z3950::SearchResponse class in cases
 # where `searchStatus' is false (indicating failure).  This must be
@@ -197,8 +202,6 @@ use Net::Z3950::Connection;
 use Net::Z3950::APDU;
 use Net::Z3950::ResultSet;
 use Net::Z3950::Record;
-#use Net::Z3950::Query;		### Not yet implemented
-#use Net::Z3950::Diagnostic;		### Not yet implemented
 
 
 =head1 FUNCTIONS
@@ -256,6 +259,11 @@ Mike Taylor E<lt>mike@tecc.co.ukE<gt>
 First version Tuesday 23rd May 2000.
 
 =head1 SEE ALSO
+
+The ZOOM API for Z39.50, of which this is an implementation, is fully
+specified at
+http://zoom.z3950.org
+where links to other implementations may also be found.
 
 This module is built on Index Data's Yaz (Yet Another Z39.50) toolkit,
 which is freely available at

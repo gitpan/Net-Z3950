@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.3 2001/07/18 12:20:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.4 2001/10/12 15:16:13 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -195,7 +195,7 @@ sub rawdata {
 }
 
 
-=head2 Net::Z3950::Record::USMARC, Net::Z3950::Record::UKMARC, Net::Z3950::Record::NORMARC, Net::Z3950::Record::LIBRISMARC, Net::Z3950::Record::DANMARC
+=head2 Net::Z3950::Record::USMARC, Net::Z3950::Record::UKMARC, Net::Z3950::Record::NORMARC, Net::Z3950::Record::LIBRISMARC, Net::Z3950::Record::DANMARC, Net::Z3950::Record::UNIMARC
 
 Represents a record using the appropriate MARC (MAchine Readable
 Catalogue) format - binary formats used extensively in libraries.
@@ -266,6 +266,12 @@ use vars qw(@ISA);
 sub nfields { return 1 }
 sub render { return ${ shift() } }
 
+package Net::Z3950::Record::UNIMARC;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::UNIMARC);
+sub nfields { return 1 }
+sub render { return ${ shift() } }
+
 
 =head2 Net::Z3950::Record::XML
 
@@ -282,8 +288,8 @@ package Net::Z3950::Record::XML;
 use vars qw(@ISA);
 @ISA = qw(Net::Z3950::Record Net::Z3950::APDU::XML);
 #   ###	I don't think there's any such thing as ...::APDU::XML (and
-#	the same applies to the analogous classes for other record
-#	types.)
+#	the same applies to the analogous classes for other opqaue
+#	record types.)
 
 sub nfields {
     return 1;			### not entirely true

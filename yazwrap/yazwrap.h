@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.2 2001/10/12 15:16:14 mike Exp $ */
 
 /*
  * yazwrap/yazwrap.h -- wrapper functions for Yaz's client API.
@@ -37,9 +37,10 @@ databuf makeInitRequest(databuf referenceId,
 			mnchar *groupid,
 			mnchar *implementationId,
 			mnchar *implementationName,
-			mnchar *implementationVersion
+			mnchar *implementationVersion,
 			/* userInformationField */
 			/* otherInfo */
+			char **errmsgp
 			);
 
 databuf makeSearchRequest(databuf referenceId,
@@ -54,7 +55,8 @@ databuf makeSearchRequest(databuf referenceId,
 			  char *mediumSetElementSetName,
 			  int preferredRecordSyntax,
 			  int queryType,
-			  char *query
+			  char *query,
+			  char **errmsgp
 			  /* additionalSearchInfo */
 			  /* otherInfo */
 			  );
@@ -70,11 +72,12 @@ databuf makePresentRequest(databuf referenceId,
 			   /* num_ranges */
 			   /* additionalRanges */
 			   char *elementSetName,
-			   int preferredRecordSyntax
+			   int preferredRecordSyntax,
 			   /* maxSegmentCount */
 			   /* maxRecordSize */
 			   /* maxSegmentSize */
 			   /* otherInfo */
+			   char **errmsgp
 			   );
 
 SV *decodeAPDU(COMSTACK cs, int *reasonp);

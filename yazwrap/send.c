@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.2 2001/02/16 16:51:06 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.3 2001/10/12 15:16:14 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -20,17 +20,15 @@
 
 Z_ReferenceId *make_ref_id(Z_ReferenceId *buf, databuf refId);
 static Odr_oid *record_syntax(ODR odr, int preferredRecordSyntax);
-static databuf encode_apdu(ODR odr, Z_APDU *apdu);
-static void prepare_odr(ODR *odrp);
-static databuf nodata(char *debug);
+static databuf encode_apdu(ODR odr, Z_APDU *apdu, char **errmsgp);
+static int prepare_odr(ODR *odrp, char **errmsgp);
+static databuf nodata(char *msg);
 
 
 /*
- * The YAZ memory allocation function go fatal on memory exhaustion,
- * so in interface terms, that's a "can't happen".  What else can go
- * wrong?  The actual encoding of the APDU into an ODR buffer is the
- * only other possibility, so we diagnose that by returning a databuf
- * with a null data member.
+ * Errors are indicated by returning a databuf with a null data member,
+ * with *errmsgp pointed at an error message whose memory is managed by
+ * this module.
  */
 databuf makeInitRequest(databuf referenceId,
 			int preferredMessageSize,
@@ -40,7 +38,8 @@ databuf makeInitRequest(databuf referenceId,
 			mnchar *groupid,
 			mnchar *implementationId,
 			mnchar *implementationName,
-			mnchar *implementationVersion)
+			mnchar *implementationVersion,
+			char **errmsgp)
 {
     static ODR odr = 0;
     Z_APDU *apdu;
@@ -49,7 +48,8 @@ databuf makeInitRequest(databuf referenceId,
     Z_IdAuthentication auth;
     Z_IdPass id;
 
-    prepare_odr(&odr);
+    if (!prepare_odr(&odr, errmsgp))
+	return nodata((char*) 0);
     apdu = zget_APDU(odr, Z_APDU_initRequest);
     req = apdu->u.initRequest;
 
@@ -106,7 +106,7 @@ databuf makeInitRequest(databuf referenceId,
     if (implementationVersion != 0)
 	req->implementationVersion = implementationVersion;
 
-    return encode_apdu(odr, apdu);
+    return encode_apdu(odr, apdu, errmsgp);
 }
 
 
@@ -126,7 +126,8 @@ databuf makeSearchRequest(databuf referenceId,
 			  char *mediumSetElementSetName,
 			  int preferredRecordSyntax,
 			  int queryType,
-			  char *query)
+			  char *query,
+			  char **errmsgp)
 {
     static ODR odr = 0;
     Z_APDU *apdu;
@@ -139,8 +140,10 @@ databuf makeSearchRequest(databuf referenceId,
     Odr_oct ccl_query;
     struct ccl_rpn_node *rpn;
     int error, pos;
+    static CCL_bibset bibset;
 
-    prepare_odr(&odr);
+    if (!prepare_odr(&odr, errmsgp))
+	return nodata((char*) 0);
     apdu = zget_APDU(odr, Z_APDU_searchRequest);
     req = apdu->u.searchRequest;
 
@@ -165,7 +168,7 @@ databuf makeSearchRequest(databuf referenceId,
     /* Convert from our enumeration to the corresponding OID */
     if ((req->preferredRecordSyntax =
 	 record_syntax(odr, preferredRecordSyntax)) == 0)
-	return nodata("can't convert record syntax");
+	return nodata(*errmsgp = "can't convert record syntax");
 
     /* Convert from our querytype/query pair to a Z_Query */
     req->query = &zquery;
@@ -175,7 +178,7 @@ databuf makeSearchRequest(databuf referenceId,
 	/* ### Is type-1 always right?  What about type-101 when under v2? */
         zquery.which = Z_Query_type_1;
         if ((zquery.u.type_1 = p_query_rpn (odr, PROTO_Z3950, query)) == 0)
-	    return nodata("can't compile PQN query");
+	    return nodata(*errmsgp = "can't compile PQN query");
         break;
 
     case QUERYTYPE_CCL:
@@ -187,10 +190,20 @@ databuf makeSearchRequest(databuf referenceId,
 
     case QUERYTYPE_CCL2RPN:
         zquery.which = Z_Query_type_1;
-        if ((rpn = ccl_find_str((CCL_bibset) 0, query, &error, &pos)) == 0)
-	    return nodata("can't compile CCL query");
+	if (bibset == 0) {
+	    FILE *fp;
+	    bibset = ccl_qual_mk();
+	    if ((fp = fopen("ccl.qual", "r")) != 0) {
+		ccl_qual_file(bibset, fp);
+		fclose(fp);
+	    } else if (errno != ENOENT) {
+		return nodata(*errmsgp = "can't read CCL qualifier file");
+	    }
+	}
+        if ((rpn = ccl_find_str(bibset, query, &error, &pos)) == 0)
+	    return nodata(*errmsgp = (char*) ccl_err_msg(error));
         if ((zquery.u.type_1 = ccl_rpn_query(odr, rpn)) == 0)
-	    return nodata("can't encode Type-1 query");
+	    return nodata(*errmsgp = "can't encode Type-1 query");
         attrset.proto = PROTO_Z3950;
         attrset.oclass = CLASS_ATTSET;
         attrset.value = VAL_BIB1; /* ### should be configurable! */
@@ -199,10 +212,10 @@ databuf makeSearchRequest(databuf referenceId,
         break;
 
     default:
-	return nodata("unknown queryType");
+	return nodata(*errmsgp = "unknown queryType");
     }
 
-    return encode_apdu(odr, apdu);
+    return encode_apdu(odr, apdu, errmsgp);
 }
 
 
@@ -211,7 +224,8 @@ databuf makePresentRequest(databuf referenceId,
 			   int resultSetStartPoint,
 			   int numberOfRecordsRequested,
 			   char *elementSetName,
-			   int preferredRecordSyntax)
+			   int preferredRecordSyntax,
+			   char **errmsgp)
 {
     static ODR odr = 0;
     Z_APDU *apdu;
@@ -220,7 +234,8 @@ databuf makePresentRequest(databuf referenceId,
     Z_RecordComposition rcomp;
     Z_ElementSetNames esname;
 
-    prepare_odr(&odr);
+    if (!prepare_odr(&odr, errmsgp))
+	return nodata((char*) 0);
     apdu = zget_APDU(odr, Z_APDU_presentRequest);
     req = apdu->u.presentRequest;
 
@@ -236,9 +251,9 @@ databuf makePresentRequest(databuf referenceId,
     esname.u.generic = elementSetName;
     if ((req->preferredRecordSyntax =
 	 record_syntax(odr, preferredRecordSyntax)) == 0)
-	return nodata("can't convert record syntax");
+	return nodata(*errmsgp = "can't convert record syntax");
 
-    return encode_apdu(odr, apdu);
+    return encode_apdu(odr, apdu, errmsgp);
 }
 
 
@@ -274,7 +289,6 @@ static Odr_oid *record_syntax(ODR odr, int preferredRecordSyntax)
 }
 
 
-
 /*
  * Memory management strategy: every APDU we're asked to allocate
  * obliterates the previous one by overwriting our static ODR buffer,
@@ -284,14 +298,13 @@ static Odr_oid *record_syntax(ODR odr, int preferredRecordSyntax)
  * context, since we know that the Perl XS code is about to copy the
  * data onto its stack.)
  */
-static databuf encode_apdu(ODR odr, Z_APDU *apdu)
+static databuf encode_apdu(ODR odr, Z_APDU *apdu, char **errmsgp)
 {
     databuf res;
     res.data = 0;
 
     if (!z_APDU(odr, &apdu, 0, (char*) 0)) {
-	/* ### it's a bit naughty to generate output here */
-        odr_perror(odr, "Encoding APDU");
+	*errmsgp = odr_errmsg(odr_geterror(odr));
 	return res;
     }
 
@@ -300,14 +313,16 @@ static databuf encode_apdu(ODR odr, Z_APDU *apdu)
 }
 
 
-static void prepare_odr(ODR *odrp)
+static int prepare_odr(ODR *odrp, char **errmsgp)
 {
     if (*odrp != 0) {
 	odr_reset(*odrp);
     } else if ((*odrp = odr_createmem(ODR_ENCODE)) == 0) {
-	yaz_log(LOG_FATAL, "Can't create ODR stream");
-	exit(1);
+	*errmsgp = "can't create ODR stream";
+	return 0;
     }
+
+    return 1;
 }
 
 
@@ -315,12 +330,14 @@ static void prepare_odr(ODR *odrp)
  * Return a databuf with a null pointer (used as an error indicator)
  * (In passing, we also report to stderr what the problem was.)
  */
-static databuf nodata(char *debug)
+static databuf nodata(char *msg)
 {
     databuf buf;
 
 #ifndef NDEBUG
-    fprintf(stderr, "nodata(): %s\n", debug);
+    if (msg != 0) {
+	fprintf(stderr, "DEBUG nodata(): %s\n", msg);
+    }
 #endif
     buf.data = 0;
     return buf;

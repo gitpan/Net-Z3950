@@ -1,6 +1,31 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.5 2001/07/18 12:20:47 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.8 2001/10/12 16:02:43 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.20  Fri Oct 12 17:12:04 2001
+	- Add name() method to the Net::Z3950::Connection class.
+	- Add the wherewithal for asynchronous operations to invoke
+	  callbacks when they complete
+	- Fix staggeringly stupid bug in which the synchronous
+	  search() method would always expect an initResponse, so that
+	  you couldn't call search() twice on one connection.
+	- Add support for the UNIMARC record syntax (required by Bath)
+	- Remove the stupid and implemented records() method from the
+	  Connection class.
+	- Implement CCL qualifiers, specified in "ccl.qual" file.
+	- Improve diagnostics from APDU assembly.
+	- Fix a rather silly bug where records, once fetched, were
+	  cached irrespective of their element-set name, so that
+	  record fetched as 'b' and then as 'f' would appear brief.
+	- Revamp the "samples" directory: all examples now work(!)
+	- Add ZOOM references to the documentation.
+	- Minor fixes to documentation, comments, etc.
+
+	  (This major revision - indicated by the increment of the
+	  first-decimal-place version number - was largely motivated
+	  by the October 2001 ZIG meeting's tutorial, for which I
+	  prepared a simple multiplexing client, and was surprised at
+	  how hard it turned out to be.)
 
 0.14  Wed Jul 18 13:25:06 2001
 	- Add support for retrieving XML records: new record-syntax

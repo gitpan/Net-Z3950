@@ -11,12 +11,16 @@ Z3950/Manager.pm
 Z3950/Record.pm
 Z3950/ResultSet.pm
 Z3950/Tutorial.pm
+ccl.qual
 doc/Albums
 doc/Makefile
 doc/gui.html
+doc/htmlify
 doc/index.html
+doc/style.css
 doc/todo.html
 doc/visit.html
+samples/README
 samples/fetch1.pl
 samples/multiplex.pl
 samples/simple.pl

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.1.1.1 2001/02/12 10:53:54 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.3 2001/10/12 15:29:17 mike Exp $
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -68,7 +68,7 @@ my $conn1 = $mgr->connect('www.indexdata.dk', 210)
     or (print "not ok 5 ($!)\n"), exit;
 print "ok 5\n";
 
-### no-op for historical reasons
+# no-op for historical reasons
 print "ok 6\n";
 
 # First init response
@@ -90,8 +90,8 @@ if (!$r->result()) {
 }
 print "ok 10\n";
 
+# We shouldn't really print this stuff if a test script.
 if (0) {
-    ### We shouldn't really print this stuff if a test script.
     print "Connection accepted\n";
     print "referenceId: '", $r->referenceId(), "'\n";
     print "preferredMessageSize: '", $r->preferredMessageSize(), "'\n";
@@ -102,7 +102,7 @@ if (0) {
 }
 
 # No test -- currently this "just works"
-### Amazingly, the GILS server supports neither 1=1 nor 1=21!
+# Amazingly, the GILS server supports neither 1=1 nor 1=21!
 $conn1->option('databaseName', 'gils');
 $conn1->startSearch(-prefix => 'mineral');
 
@@ -125,8 +125,8 @@ print "ok 14\n";
 # No test -- this "just works"
 my $size = $rs->size();
 
+# We shouldn't really print this stuff if a test script.
 if (0) {
-    ### We shouldn't really print this stuff if a test script.
     my $r = $rs->{searchResponse};
     print "referenceId: '", $r->referenceId(), "'\n";
     print "resultCount: '", $r->resultCount(), "'\n";
@@ -160,16 +160,18 @@ OUTER_LOOP: while (1) {
 
 	$rec = $rs->record($i);
 	if (defined $rec) {
+	    # We shouldn't really print this stuff if a test script.
 	    if (0) {
-		### We shouldn't really print this stuff if a test script.
 		print "\nRecord $i: ", $rec->render();
 	    }
 	    $seen[$i] = 1;
 	} elsif ($rs->errcode() != 0) {
-	    ###	Most likely this test suite will stop early here,
-	    #	after the 11th record of 17 in the result set.  This
-	    #	is due to yaz-ztest not having proper GRS-1 support.
-	    #	Test against a real server instead if you can.
+	    # The test suite will stop early here if you run it
+	    # against the "ztest" server supplied with Yaz, after the
+	    # 11th record of 17 in the result set.  This is due to
+	    # ztest's somewhat idiosyncratic interpretation of what
+	    # constitutes a seventeen-record result set.  Test against
+	    # a real server instead.
 	    die("can't fetch record $i of $size: " .
 		"error code=" . $rs->errcode() .
 		" [" . Net::Z3950::errstr($rs->errcode()) . "], " .
