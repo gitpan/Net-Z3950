@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.2 2001/10/12 15:16:13 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.5 2002/01/29 10:34:15 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -292,6 +292,7 @@ sub _ready_to_write {
     if ($nwritten < 0 && $! == ECONNREFUSED) {
 	print "[$addr] connection refused\n";
 	$conn->_destroy();
+	Event::unloop(undef);
     } elsif ($nwritten < 0) {
 	print "[$addr] yaz_write() failed ($!): closing connection\n";
 	$watcher->cancel();
@@ -523,6 +524,10 @@ sub expect {
     my($op, $opname) = @_;
 
     my $conn = $this->manager()->wait();
+    # Error not associated with a connection, e.g. ECONNREFUSED
+    return undef
+	if !defined $conn;
+
     ###	We would prefer just to ignore any events on connections other
     #	than this one, but there isn't a way to do this (unless we
     #	invent one, storing other-connection events until they're
@@ -708,6 +713,44 @@ sub name {
     my $this = shift();
 
     return $this->{host} . ':' . $this->{port};
+}
+
+
+=head2 close()
+
+	$conn->close();
+
+This lets the C<Net::Z3950> module know that you no longer want to use
+C<$conn> so it can be closed.  It would be nice if this could be done
+implicitly when C<$conn> goes out of scope, as in:
+
+	{
+	    $conn = new Net::Z3950::Connection($host, $port);
+	    $rs = $conn->search($query);
+	    print "found ", $rs->size(), " records\n";
+	}
+
+But in general this won't work, because C<$conn> is not the only
+reference to the connection object: when it goes out of scope, the
+connection is not destroyed because its manager still holds a
+reference to it.  So use C<$conn->close()> (just before the close
+brace in the example above) to let the connection know it's done with.
+
+=cut
+
+sub close {
+    my $this = shift();
+
+    my $mgr = delete $this->{mgr};
+    $mgr->forget($this);
+    ### How can we check if our refcount is zero now?
+}
+
+
+sub DESTROY {
+    my $this = shift();
+
+    #warn "destroying Net::Z3950 Connection $this";
 }
 
 

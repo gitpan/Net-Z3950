@@ -1,6 +1,34 @@
-$Header: /home/cvsroot/NetZ3950/Changes,v 1.10 2001/10/19 15:40:25 mike Exp $
+$Header: /home/cvsroot/NetZ3950/Changes,v 1.16 2002/01/29 15:47:46 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.25  Tue Jan 29 15:56:48 2002
+	- Remove some obsolete comments (documenting bugs that are now
+	  fixed!)
+	- Fix type mismatch in encode_APDU() -- we've been getting
+	  away with it until now because sizeof(size_t)==sizeof(int)
+	  on most systems, but not on the 64-bit DEC Alpha OSF/1.
+	- Fix daft-but-harmless bug in yazwrap/receive.c's setString()
+	  functions, in which we return the value of a void function.
+	  Most compilers DWIM, but not all.
+	- Add explicit casts to (char*) in yazwrap/receive.c where I'd
+	  been assuming the conversion from unsigned char*.  Ho hum.
+
+0.24  Wed Jan 23 11:39:32 2002
+	- Fix a truly stupid bug which prevents synchronous connection
+	  from working.  I missed this in 0.23 because the test script
+	  -- unlike almost every other Net::Z3950 program -- uses
+	  asynchronous connection.  D'oh!
+
+0.23  Tue Jan 22 16:11:41 2002
+	- Handle surrogate diagnostics (e.g. bad element set name).
+	- Finally fix that stupid "No rule to make target `pure_all'"
+	  message that "make test" always used to produce in the
+	  yazwrap directory.
+	- Add support for retrieving HTML records: new record-syntax
+	  enumeration TEXT_HTML, and a new record-type class
+	  Net::Z3950::Record::HTML.
+	- Fix hanging on ECONNREFUSED.
 
 0.22  Fri Oct 19 16:37:44 2001
 	- Add rudimentary ("straight through") support for the OPAC
@@ -113,3 +141,12 @@ Revision history for Perl extension Net::Z3950.
 	  author's house; this is the first one that was sent to Index
 	  Data.
 
+--
+
+To be done:
+	- ### Fix test.pl to work against either local or remote server.
+	- ### Add close() method for connections.
+	- ### Make managers drop references to closed connections.
+	- ### Make $mgr->wait() finish when there are no connections left.
+	- ### Add optional timeout parameter to $mgr->wait()
+	- ### Add GPL.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.2 2001/10/12 15:16:14 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/samples/simple.pl,v 1.3 2002/01/22 14:51:01 mike Exp $
 
 use Net::Z3950;
 
@@ -18,7 +18,7 @@ for (my $i = 0; $i < $n; $i++) {
     my $rec = $rs->record($i+1);
     if (!defined $rec) {
 	print STDERR "record", $i+1, ": error #", $rs->errcode(),
-	    " (", $rs->errmsg()), "): ", $rs->addinfo(), "\n";
+	    " (", $rs->errmsg(), "): ", $rs->addinfo(), "\n";
     }
     print "=== record ", $i+1, " ===\n", $rec->render();
 }

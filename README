@@ -1,4 +1,4 @@
-$Header: /home/cvsroot/NetZ3950/README,v 1.7 2001/10/19 15:40:25 mike Exp $
+$Header: /home/cvsroot/NetZ3950/README,v 1.8 2001/10/25 11:57:50 mike Exp $
 
 Net::Z3950.pm -- What Is It?
 ----------------------------
@@ -56,21 +56,6 @@ After installing any prerequisites, you know the drill:
 	make test
 	make install
 
-The only wrinkle in this procedure is that the "make test" stage
-finishes by complaining as follows:
-
-	make[1]: Entering directory `.../NetZ3950/yazwrap'
-	make[1]: *** No rule to make target `pure_all', needed by `test_dynamic'.  Stop.
-	make[1]: Leaving directory `.../NetZ3950/yazwrap'
-	make: *** [test] Error 2
-
-You can ignore this: it's not a problem at all.  Just go ahead and do
-the "make install" bit.  I should of course fix the build procedure so
-that "make test" doesn't try to run in the "yazwrap" directory, but
-I'm having an insanely difficult time conveying this seemingly trivial
-instruction to the totalitarial monolith that is ExtUtils::MakeMaker.
-Can NO-ONE tell me how to fix this?!
-
 
 Now What?
 ---------
@@ -83,24 +68,29 @@ POD documents, and start reading at doc/index.html.
 Support
 -------
 
+
 Informal support is available directly from the author (see below) but
-there are of course no guarantees!  In general a better option is to
-join the Net::Z3950 mailing list, and discuss in that forum any
-problems you may encounter.  I read this list, so I will see your
-messages.  Its home page (with subscription instructions) is at
-http://www.indexdata.dk/mailman/listinfo/net-z3950
+since ``you get what you pay for'' and I'm doing it for free, there
+are of course no guarantees!
+
+In general a better option is to join the Net::Z3950 mailing list at
+http://www.indexdata.dk/mailman/listinfo/net-z3950, and discuss in
+that forum any problems you may encounter.  I read this list, so I
+will see your messages; but you may get better help from others who
+have run into similar difficulties.
 
 For those who require it, it's possible to buy professional,
-commercial support for this module -- with well-defined support levels
-and response times -- from Index Data, in collaboration with whom I
-wrote this module. For details, email them on <info@indexdata.dk>
+commercial support for this module, with well-defined support levels
+and response times, from Index Data, in collaboration with whom I
+wrote this module.  See http://perl.z3950.org/support/contract.html or
+email <info@indexdata.dk> for details.
 
 
 Author
 ------
 
-Mike Taylor <mike@miketaylor.org.uk>
-	http://miketaylor.tecc.co.uk/
+Mike Taylor <mike@perl.z3950.org>
+	http://www.miketaylor.org.uk/
 
 With lots of help, encouragement, design input, etc. from
 

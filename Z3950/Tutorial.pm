@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.3 2001/07/18 12:20:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.4 2002/01/22 16:02:03 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -283,9 +283,10 @@ they include
 C<Net::Z3950::RecordSyntax::GRS1>,
 C<Net::Z3950::RecordSyntax::SUTRS>,
 C<Net::Z3950::RecordSyntax::USMARC>,
-C<Net::Z3950::RecordSyntax::TEXT_XML>
+C<Net::Z3950::RecordSyntax::TEXT_XML>,
+C<Net::Z3950::RecordSyntax::APPLICATION_XML>
 and
-C<Net::Z3950::RecordSyntax::APPLICATION_XML>.
+C<Net::Z3950::RecordSyntax::TEXT_HTML>
 
 (As always, C<option()> may also be invoked with no ``value''
 parameter to return the current value of the option.)

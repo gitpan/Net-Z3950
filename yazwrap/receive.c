@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.4 2001/10/19 15:40:25 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.6 2002/01/29 10:34:15 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -169,7 +169,7 @@ static SV *translateInitResponse(Z_InitResponse *res, int *reasonp)
 
     if (res->referenceId) {
 	setBuffer(hv, "referenceId",
-		  res->referenceId->buf, res->referenceId->len);
+		  (char*) res->referenceId->buf, res->referenceId->len);
     }
     /* protocolVersion not translated (complex data type) */
     /* options not translated (complex data type) */
@@ -197,7 +197,7 @@ static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp)
     sv = newObject("Net::Z3950::APDU::SearchResponse", (SV*) (hv = newHV()));
     if (res->referenceId)
 	setBuffer(hv, "referenceId",
-		  res->referenceId->buf, res->referenceId->len);
+		  (char*) res->referenceId->buf, res->referenceId->len);
 
     setNumber(hv, "resultCount", (IV) *res->resultCount);
     setNumber(hv, "numberOfRecordsReturned",
@@ -227,7 +227,7 @@ static SV *translatePresentResponse(Z_PresentResponse *res, int *reasonp)
 
     if (res->referenceId)
 	setBuffer(hv, "referenceId",
-		  res->referenceId->buf, res->referenceId->len);
+		  (char*) res->referenceId->buf, res->referenceId->len);
     setNumber(hv, "numberOfRecordsReturned",
 	      (IV) *res->numberOfRecordsReturned);
     setNumber(hv, "nextResultSetPosition", (IV) *res->nextResultSetPosition);
@@ -338,7 +338,7 @@ static SV *translateExternal(Z_External *x)
     case Z_External_octet:
 	/* This is used for any opaque data-block (i.e. just a hunk of
 	 * octets) -- in particular, for records in any of the *MARC
-	 * syntaxes and for XML records.
+	 * syntaxes and for XML and HTML records.
 	 */
 	return translateOctetAligned(x->u.octet_aligned, x->direct_reference);
     default:
@@ -359,7 +359,8 @@ static SV *translateSUTRS(Z_SUTRS *x)
      * analogue, but with additional, record-syntax-specific,
      * functionality.
      */
-    return newObject("Net::Z3950::Record::SUTRS", newSVpvn(x->buf, x->len));
+    return newObject("Net::Z3950::Record::SUTRS",
+		     newSVpvn((char*) x->buf, x->len));
 }
 
 
@@ -464,7 +465,7 @@ static SV *translateElementData(Z_ElementData *x)
  * We assume that the record, not processed here, will subsequently be
  * picked apart by some pre-existing module, most likely MARC.pm for
  * *MARC records; I'd be interested to know what people use for XML
- * records.
+ * and HTML records.
  */
 static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 {
@@ -479,6 +480,7 @@ static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 	{ VAL_DANMARC,		"Net::Z3950::Record::DANMARC" },
 	{ VAL_UNIMARC,		"Net::Z3950::Record::UNIMARC" },
 	{ VAL_UNIMARC,		"Net::Z3950::Record::UNIMARC" },
+	{ VAL_HTML,		"Net::Z3950::Record::HTML" },
 	{ VAL_TEXT_XML,		"Net::Z3950::Record::XML" },
 	{ VAL_APPLICATION_XML,	"Net::Z3950::Record::XML" },
 	{ VAL_OPAC,		"Net::Z3950::Record::OPAC" },
@@ -602,7 +604,7 @@ static void setNumber(HV *hv, char *name, IV val)
 
 static void setString(HV *hv, char *name, char *val)
 {
-    return setBuffer(hv, name, val, 0);
+    setBuffer(hv, name, val, 0);
 }
 
 

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Manager.pm,v 1.2 2002/01/22 14:51:01 mike Exp $
 
 package Net::Z3950::Manager;
 use Event;
@@ -264,6 +264,30 @@ sub resultSets {
     }
 
     return @rs;
+}
+
+
+### PRIVATE to the Net::Z3950::Connection::close() method.
+sub forget {
+    my $this = shift();
+    my($conn) = @_;
+
+    my $n = $this->connections();
+    for (my $i = 0; $i < $n; $i++) {
+	next if $this->{connections}->[$i] ne $conn;
+	warn "forgetting connection $i of $n";
+	splice @{ $this->{connections} }, $i, 1;
+	return;
+    }
+
+    die "$this can't forget $conn";
+}
+
+
+sub DESTROY {
+    my $this = shift();
+
+    #warn "destroying Net::Z3950 Connection $this";
 }
 
 

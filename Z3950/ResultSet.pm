@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.2 2001/10/12 15:16:13 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.3 2001/11/01 17:02:58 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -355,16 +355,14 @@ sub _insert_records {
 
 	### We're ignoring databaseName -- do we have any use for it?
 	my $which = $record->which();
-	{
-	    ### Should deal more gracefully with surrogate
-	    #	diagnostics, not to mention segmentation fragments
-	    my $type = Net::Z3950::NamePlusRecord::DatabaseRecord;
-	    if ($which != $type) {
-		die "expected $type, got $which";
-	    }
+	if ($which == Net::Z3950::NamePlusRecord::DatabaseRecord) {
+	    $records->[$first+$i] = $record->databaseRecord();
+	} elsif ($which == Net::Z3950::NamePlusRecord::SurrogateDiagnostic) {
+	    $records->[$first+$i] = $record->surrogateDiagnostic();
+	} else {
+	    ### Should deal with segmentation fragments
+	    die "expected DatabaseRecord, got record-type $which";
 	}
-
-	$records->[$first+$i] = $record->databaseRecord();
     }
 
     return 1;

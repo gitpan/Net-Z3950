@@ -18,7 +18,7 @@ WriteMakefile(
 #	it at all?  What's it for?  Omitting it does in fact prevent
 #	the build from working!
 #   'SKIP'	=> [qw(all static static_lib dynamic dynamic_lib)],
-    'SKIP'	=> [qw(all static dynamic)],
+    'SKIP'	=> [qw(all static dynamic test)],
     'clean'	=> {'FILES' => 'libyazwrap$(LIB_EXT)'},
 	      'OPTIMIZE' => '-g',	### temporary
 );

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.5 2001/10/19 15:40:25 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.6 2002/01/22 16:02:03 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -212,6 +212,10 @@ similarly, Net::Z3950::Record::UKMARC, Net::Z3950::Record::NORMARC, I<etc>.
 =item *
 
 Net::Z3950::Record::XML
+
+=item *
+
+Net::Z3950::Record::HTML
 
 I<### others, not yet supported>
 

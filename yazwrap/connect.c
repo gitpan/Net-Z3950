@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.1.1.1 2001/02/12 10:53:55 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.2 2002/01/29 10:34:15 mike Exp $ */
 
 /*
  * yazwrap/connect.c -- wrapper functions for Yaz's client API.
@@ -19,11 +19,6 @@
  *	non-blocking, so that we'll need to catch and service the
  *	"connection complete" callback.  We're not doing that, but the
  *	code more or less works anyway -- what gives?!
- *
- *  ###	One problem is that when the connection can't be made -- for
- *	example, because the server's not running -- we get a rude
- *	SIGPIPE instead of a nice polite ECONNREFUSED.  Can we get
- *	around that?
  */
 COMSTACK yaz_connect(char *addr)
 {

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.3 2001/10/12 15:16:14 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.4 2002/01/29 10:34:15 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -301,6 +301,7 @@ static Odr_oid *record_syntax(ODR odr, int preferredRecordSyntax)
 static databuf encode_apdu(ODR odr, Z_APDU *apdu, char **errmsgp)
 {
     databuf res;
+    int len;
     res.data = 0;
 
     if (!z_APDU(odr, &apdu, 0, (char*) 0)) {
@@ -308,7 +309,8 @@ static databuf encode_apdu(ODR odr, Z_APDU *apdu, char **errmsgp)
 	return res;
     }
 
-    res.data = odr_getbuf(odr, &res.len, (int*) 0);
+    res.data = odr_getbuf(odr, &len, (int*) 0);
+    res.len = len;
     return res;
 }
 

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.5 2001/10/19 15:40:25 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.6 2002/01/22 16:02:03 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -297,6 +297,35 @@ sub nfields {
 
 sub render {
     return "[can't render a Net::Z3950::Record::XML - not yet implemented]\n";
+}
+
+sub rawdata {
+    my $this = shift();
+    return $$this;
+}
+
+
+=head2 Net::Z3950::Record::HTML
+
+Represents a a record using HTML (HyperText Markup Language), as
+defined by the W3C.  Rendering is not currently defined: this module
+treats the record as a single opaque lump of data, to be handled by
+other software.
+
+For more information about HTML, see http://www.w3.org/MarkUp/
+
+=cut
+
+package Net::Z3950::Record::HTML;
+use vars qw(@ISA);
+@ISA = qw(Net::Z3950::Record Net::Z3950::APDU::HTML);
+
+sub nfields {
+    return 1;			### not entirely true
+}
+
+sub render {
+    return "[can't render a Net::Z3950::Record::HTML - not yet implemented]\n";
 }
 
 sub rawdata {
