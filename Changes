@@ -1,6 +1,15 @@
-$Id: Changes,v 1.60 2004/11/01 09:14:58 mike Exp $
+$Id: Changes,v 1.62 2004/11/22 23:01:41 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.46  Mon Nov 22 23:42:40 2004
+	- Use the MARC::Record module for rendering MARC records
+	  instead of the older, unsupported and possibly buggy
+	  MARC.pm.
+
+	  WARNING: This change is backwards incompatible, but that
+	  incompatibility will only affect you if you're relying on
+	  the precise formatting of $rec->render() on MARC records.
 
 0.45  Mon Nov  1 09:13:51 2004
 	- Support for "charset" and "language" options added by Adam
@@ -419,9 +428,6 @@ Revision history for Perl extension Net::Z3950.
 --
 
 To be done:
-	- ### Use the newer MARC::Record module instead of MARC.pm
-		Render with  MARC::File::USMARC::decode($rec->rawdata())
-		Or with      MARC::Record ->as_formatted()
 	- ### Fix test.pl to work against either local or remote server.
 	- ### Make managers drop references to closed connections.
 	- ### Make $mgr->wait() finish when there are no connections left.

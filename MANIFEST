@@ -39,3 +39,4 @@ yazwrap/send.c
 yazwrap/util.c
 yazwrap/yazwrap.h
 yazwrap/ywpriv.h
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-# $Id: Z3950.pm,v 1.39 2004/11/01 09:15:07 mike Exp $
+# $Id: Z3950.pm,v 1.40 2004/11/22 22:32:32 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

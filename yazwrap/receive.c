@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.16 2004/05/06 15:42:00 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.17 2004/11/22 22:58:01 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -827,9 +827,9 @@ static SV *translateCircRecord(Z_CircRecord *x)
  * maps it to a class-name string.
  *
  * We assume that the record, not processed here, will subsequently be
- * picked apart by some pre-existing module, most likely MARC.pm for
- * *MARC records; I'd be interested to know what people use for XML
- * and HTML records.
+ * picked apart by some pre-existing module, most likely the
+ * MARC::Record module for *MARC records; I'd be interested to know
+ * what people use for XML and HTML records.
  */
 static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
 {

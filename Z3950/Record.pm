@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.13 2003/10/24 10:08:28 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Record.pm,v 1.14 2004/11/22 22:41:47 mike Exp $
 
 package Net::Z3950::Record;
 use strict;
@@ -228,14 +228,9 @@ sub nfields {
 sub render {
     my $this = shift();
 
-    require MARC;
-    my $inc = MARC::Rec->new();
-    my($rec, $status) = $inc->nextrec($this->rawdata());
-    return "[can't translate MARC record]\n"
-	if !$status;
-    return "[translated MARC record to undefined value!]\n"
-	if !defined $rec;
-    return $rec->output({ format => 'ascii' });
+    require MARC::Record;
+    my $rec = MARC::Record->new_from_usmarc($this->rawdata());
+    return $rec->as_formatted();
 }
 
 sub rawdata {

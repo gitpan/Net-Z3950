@@ -1,10 +1,12 @@
-# $Header: /home/cvsroot/NetZ3950/doc/Makefile,v 1.5 2003/06/26 21:39:45 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/doc/Makefile,v 1.6 2004/11/22 22:59:58 mike Exp $
 
 MODULES = Z3950 Z3950/Tutorial Z3950/Manager Z3950/Connection Z3950/APDU \
 	Z3950/ResultSet Z3950/Record
 PERL = $(MODULES:%=../%.pm)
 HTML = $(MODULES:%=%.html)
-JUNK = pod2html-dircache pod2html-itemcache pod2htmd.x~~ pod2htmi.x~~
+JUNK = pod2html-dircache pod2html-itemcache \
+       pod2htmd.x~~ pod2htmi.x~~ \
+       pod2htmd.tmp pod2htmi.tmp
 
 all: Z3950 Z3950/style.css $(HTML)
 
