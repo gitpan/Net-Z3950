@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.31 2004/11/01 08:31:43 adam Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.32 2005/01/04 22:09:51 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -379,7 +379,7 @@ sub _ready_to_write {
     if ($nwritten < 0 && $! == ECONNREFUSED) {
 	$conn->_destroy();
 	Event::unloop(undef);
-	die "[$addr] connection refused\n";
+	return;
     } elsif ($nwritten < 0) {
 	$watcher->cancel();
 	die "[$addr] yaz_write() failed ($!): closing connection\n";

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.17 2004/11/22 22:58:01 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.18 2005/01/04 22:12:58 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -75,6 +75,11 @@ SV *decodeAPDU(COMSTACK cs, int *reasonp)
 
     switch (cs_look(cs)) {
     case CS_CONNECT:
+	/* In fact, this never happens and I don't understand how the
+	 * connection is successfully forged.  We also don't get here 
+	 * if the connection _isn't_ forged: instead, the socket
+	 * select()s as ready to write, and writing down it fails with
+	 * ECONNREFUSED or whatever the error is. */
 	if (cs_rcvconnect(cs) < 0) {
 	    *reasonp = REASON_ERROR;
 	} else {

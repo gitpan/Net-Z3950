@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.4 2004/03/31 12:28:01 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/connect.c,v 1.5 2005/01/04 20:33:25 mike Exp $ */
 
 /*
  * yazwrap/connect.c -- wrapper functions for Yaz's client API.
@@ -13,18 +13,17 @@
 
 
 /*
- *  ###	We're setting up the connection in non-blocking mode, which is
- *	what we want.  However, the YAZ docs imply that this means
- *	that the connect() (as well as subsequent read()s) will be
- *	non-blocking, so that we'll need to catch and service the
- *	"connection complete" callback.  We're not doing that, but the
- *	code more or less works anyway -- what gives?!
+ * We're setting up the connection in non-blocking mode, which is what
+ * we want.  However, this means that the connect() (as well as
+ * subsequent read()s) will be non-blocking, so that we'll need to
+ * catch and service the "connection complete" callback in "receive.c"
  */
 COMSTACK yaz_connect(char *addr)
 {
     COMSTACK conn;
     void *inaddr;
 
+    /* Second argument is `blocking', false => no immediate errors */
     if ((conn = cs_create_host(addr, 0, &inaddr)) == 0) {
 	/* mostly likely `errno' will be ENOMEM or something useful */
         return 0;
@@ -32,11 +31,12 @@ COMSTACK yaz_connect(char *addr)
 
     switch (cs_connect(conn, inaddr)) {
     case -1:			/* can't connect */
+	/* I think this never happens due to blocking=0 */
 /*printf("cs_connect() failed\n");*/
-	/* mostly likely `errno' will be ECONNREFUSED or something useful */
         cs_close(conn);
         return 0;
     case 0:			/* success */
+	/* I think this never happens due to blocking=0 */
 /*printf("cs_connect() succeeded\n");*/
         break;
     case 1:			/* non-blocking -- "not yet" */
