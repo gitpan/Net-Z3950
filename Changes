@@ -1,6 +1,26 @@
-$Id: Changes,v 1.63 2005/01/04 22:14:59 mike Exp $
+$Id: Changes,v 1.68 2005/04/19 21:37:00 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+TO DO
+	- ### Fix so that when one of the Connection objects
+	  associated with an asynchronous Manager can't connect,
+	  $mgr->wait() returns a reference to that Connection, and
+	  arranges for $conn->op() to return Net::Z3950::Op::Error,
+	  and leaves things in a state whereby wait() can be
+	  successfully re-invoked to continue the concurrent
+	  operations of the remaining Connections.
+
+0.48  Tue Apr 19 22:36:45 2005
+	- Patches supplied by Jan Bauer Nielsen <jbn@dtv.dk> to
+	  interpret otherInformation packets, in search responses,
+	  containing a search-info report of subquery counts.
+	- Patches supplied by Myron Turner <mturner@Ms.UManitoba.CA>
+	  to protect the Net::Z3950 module against certain classes of
+	  badly-behaved server.
+	- Bring "samples/multiplex.pl" up to date, illustrating the
+	  use of this module to run sequences of queries against
+	  multiple servers in parallel.
 
 0.47  Tue Jan  4 22:15:07 2005
 	- The "connection refused" condition is now handled more

@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.17 2004/05/07 15:43:22 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.20 2005/04/19 21:36:35 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -106,6 +106,45 @@ sub size {
     return $this->{searchResponse}->resultCount();
 }
 
+
+=head2 subqueryCount()
+
+    $subquery = $rs->subqueryCount();
+
+Returns hit count of subquery terms as a hash reference containing
+(term, count) pairs, if the server returned this information.  If the
+information is not available, an undefined value is returned.
+
+=cut
+
+sub subqueryCount {
+    my $this = shift();
+
+    my $info = $this->{searchResponse}->additionalSearchInfo();
+    return undef if !$info;
+
+    my $subquery = {};
+    foreach my $unit (@{$info}) {
+	if ($unit->which() ==
+	    Net::Z3950::OtherInformationUnit::ExternallyDefinedInfo) {
+	    if (my $reports = $unit->externallyDefinedInfo()) {
+		foreach my $report (@{$reports}) {
+		    if (my $expr = $report->subqueryExpression()) {
+			if ($expr->which() ==
+			    Net::Z3950::QueryExpression::Term) {
+			    my $term = $expr->term()->queryTerm()->general();
+			    $subquery->{$term} = $report->subqueryCount()
+				if $term;
+			}
+		    }
+		}
+            }
+        }
+    }
+
+    return $subquery;
+}
+
 =head2 present()
 
     $rs->present($start, $count) or die "failed: $rs->{errcode}\n";
@@ -129,6 +168,7 @@ sub present {
     my ($this, $start, $count) = @_;
 
     my $esn = $this->option('elementSetName');
+    ### Shouldn't this cache also have a record-syntax dimension?
     if (!defined $this->{records}->{$esn}) {
 	$this->{records}->{$esn} = [];
     }
@@ -215,7 +255,19 @@ sub record {
 	# have inserted the requested record into our array, so we should
 	# just be able to return it.  Sanity-check first, though.
 	$rec = $this->{records}{$this->option('elementSetName')}[$which];
-	die "record(): impossible: didn't get record" if !defined $rec;
+	if (!defined $rec) {
+	    die "record(): impossible: didn't get record";
+	} elsif (!ref $rec) {
+	    # Why would we ever get back a record that is not a
+	    # reference?  I think only because something is very badly
+	    # wrong.  We wrap it up as a reference so it can be
+	    # render()ed without breaking the application.
+	    use Net::Z3950::Record;
+	    my $errmsg = "THIS IS NOT A USMARC RECORD.  " .
+		"Something has gone badly wrong.  " .
+		"The internal record object has value '$rec'";
+	    return bless \$errmsg, 'Net::Z3950::Record::USMARC';
+	}
     }
 
     if (ref $rec && $rec->isa('Net::Z3950::APDU::DefaultDiagFormat')) {
@@ -474,8 +526,16 @@ sub _check_slot {
     my $this = shift();
     my($rec, $which) = @_;
 
-    die "re-fetching a record that's already had an error"
-	if ref $rec && $rec->isa('Net::Z3950::APDU::DefaultDiagFormat');
+    if (ref $rec && $rec->isa('Net::Z3950::APDU::DefaultDiagFormat')) {
+        my $diag = $rec->condition();
+	# Error codes:
+	# 238 Record not available in requested syntax
+	# 239 Record syntax not supported
+	# If this has happened, we don't want to prevent the caller
+        # from trying again with a different record syntax.
+        return if $diag == 238 || $diag == 239;
+	die "re-fetching a record that's already had an error";
+    }
     die "presented record $rec already loaded"
 	if ref $rec;
     die "server was never asked for presented record"

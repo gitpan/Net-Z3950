@@ -1,26 +1,43 @@
 #!/usr/bin/perl -w
 
-# $Header: /home/cvsroot/NetZ3950/samples/multiplex.pl,v 1.4 2003/11/17 14:29:35 mike Exp $
+# $Id: multiplex.pl,v 1.6 2005/01/05 16:24:53 mike Exp $
 
 use Net::Z3950;
 use strict;
 
 # Feel free to modify @servers and @searches
-my @servers = (['localhost', 9999],
-	       ['localhost', 9998]);
-my @searches = ('computer', 'data', 'survey');
-my %conn2si;
+my @servers = (
+	       ['Z3950cat.bl.uk',     9909, "BLAC"],
+	       ['bagel.indexdata.dk', 210,  "gils"],
+	       ['z3950.loc.gov',      7090, "Voyager"],
+	       );
 
-my $mgr = new Net::Z3950::Manager(async => 1);
+my @searches = ('computer', 'data', 'survey', 'mineral');
+my %conn2si;			# Indicates, for each connection, how
+				# far through @searches it has got.
+
+my $mgr = new Net::Z3950::Manager(async => 1,
+				  preferredRecordSyntax => "usmarc");
 my @conn;
 foreach my $spec (@servers) {
-    my($host, $port, $search) = @$spec;
-    my $conn = new Net::Z3950::Connection($mgr, $host, $port, \&done_init)
-	or die "can't connect: $!";
+    my($host, $port, $dbname) = @$spec;
+    my $conn = new Net::Z3950::Connection($mgr, $host, $port, \&done_init,
+					  databaseName => $dbname)
+	or die "can't connect to $host:$port: $!";
+    #print "> got $conn, added it to $mgr\n";
 }
 
+
+#$Event::DebugLevel = 5;
 $mgr->wait();
-print "finished\n";
+print "Finished.\n";
+use Errno qw(ECONNREFUSED);
+if ($! == ECONNREFUSED) {
+    ###	At present, a single connection failing to connect makes the
+    #   whole concurrent session end.  Need to consider the interface.
+    print "(Possible premature exit due to $!)\n";
+}
+
 
 sub done_init {
     my($conn, $apdu) = @_;
@@ -46,10 +63,6 @@ sub done_search {
 	$conn->startSearch($search, \&done_search);
     } else {
 	print $conn->name(), " finished!\n";
-	### We don't have the method $conn->close();
+	$conn->close();
     }
 }
-
-__END__
-=11,15,19
-<A href="outputm.html">[output]</A>

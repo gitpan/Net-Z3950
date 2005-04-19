@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.10 2004/05/06 13:04:17 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.11 2005/04/19 21:36:35 mike Exp $
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -104,7 +104,7 @@ if (0) {
 # No test -- currently this "just works"
 # Amazingly, the GILS server supports neither 1=1 nor 1=21!
 $conn1->option('databaseName', 'gils');
-$conn1->startSearch(-prefix => 'mineral');
+$conn1->startSearch(-prefix => '@or mineral machine');
 
 # First search response
 $conn = $mgr->wait()
@@ -190,7 +190,11 @@ OUTER_LOOP: while (1) {
 }
 
 ### The following tests know details of the Zebra demo database
-$size == 18
+my $sq = $rs->subqueryCount();
+
+$size == 18            and
+$sq->{'mineral'} == 18 and
+$sq->{'machine'} == 0
     or (print "not ok 15\n"), exit;
 print "ok 15\n";
 

@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.18 2005/01/04 22:12:58 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.19 2005/04/19 21:36:35 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -46,6 +46,12 @@ static SV *translateDiagRecs(Z_DiagRecs *x);
 static SV *translateDiagRec(Z_DiagRec *x);
 static SV *translateDefaultDiagFormat(Z_DefaultDiagFormat *x);
 static SV *translateOID(Odr_oid *x);
+static SV *translateOtherInformation(Z_OtherInformation *x);
+static SV *translateOtherInformationUnit(Z_OtherInformationUnit *x);
+static SV *translateSearchInfoReport(Z_SearchInfoReport *x);
+static SV *translateSearchInfoReport_s(Z_SearchInfoReport_s *x);
+static SV *translateQueryExpression(Z_QueryExpression *x);
+static SV *translateQueryExpressionTerm(Z_QueryExpressionTerm *x);
 static SV *newObject(char *class, SV *referent);
 static void setNumber(HV *hv, char *name, IV val);
 static void setString(HV *hv, char *name, char *val);
@@ -238,8 +244,9 @@ static SV *translateSearchResponse(Z_SearchResponse *res, int *reasonp)
 	setNumber(hv, "presentStatus", (IV) *res->presentStatus);
     if (res->records)
 	setMember(hv, "records", translateRecords(res->records));
+    if (res->additionalSearchInfo)
+    setMember(hv, "additionalSearchInfo", translateOtherInformation(res->additionalSearchInfo));
 
-    /* additionalSearchInfo (OPT) not translated (complex data type) */
     /* otherInfo (OPT) not translated (complex data type) */
 
     return sv;
@@ -569,6 +576,8 @@ static SV *translateExternal(Z_External *x)
 	 * syntaxes and for XML and HTML records.
 	 */
 	return translateOctetAligned(x->u.octet_aligned, x->direct_reference);
+    case Z_External_searchResult1:
+	return translateSearchInfoReport(x->u.searchResult1);
     default:
 	break;
     }
@@ -954,6 +963,122 @@ static SV *translateOID(Odr_oid *x)
     } else {
 	return newObject("Net::Z3950::APDU::OID", newSVpv(buf, 0));
     }
+}
+
+
+static SV *translateOtherInformation(Z_OtherInformation *x)
+{
+    SV *sv;
+    AV *av;
+    int i;
+
+    sv = newObject("Net::Z3950::APDU::OtherInformation", (SV*) (av = newAV()));
+    for (i=0; i < x->num_elements; i++) {
+        av_push(av, translateOtherInformationUnit(x->list[i]));
+    }
+
+    return sv;
+}
+
+
+static SV *translateOtherInformationUnit(Z_OtherInformationUnit *x)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::OtherInformationUnit",
+		   (SV*) (hv = newHV()));
+
+    /* ### category not translated */
+    setNumber(hv, "which", x->which);
+    switch (x->which) {
+    case Z_OtherInfo_characterInfo:
+	break;
+    case Z_OtherInfo_binaryInfo:
+	break;
+    case Z_OtherInfo_externallyDefinedInfo:
+	setMember(hv, "externallyDefinedInfo",
+		  translateExternal(x->information.externallyDefinedInfo));
+	return sv;
+    case Z_OtherInfo_oid:
+	break;
+    default:
+	break;
+    }
+
+    fatal("illegal/unsupported `which' (%d) in Z_OtherInformationUnit",
+	  x->which);
+    return 0;			/* NOTREACHED; inhibit gcc -Wall warning */    
+}
+
+
+static SV *translateSearchInfoReport(Z_SearchInfoReport *x)
+{
+    SV *sv;
+    AV *av;
+    int i;
+
+    sv = newObject("Net::Z3950::APDU::SearchInfoReport", (SV*) (av = newAV()));
+    for (i=0; i < x->num; i++) {
+        av_push(av, translateSearchInfoReport_s(x->elements[i]));
+    }
+
+    return sv;
+}
+
+
+static SV *translateSearchInfoReport_s(Z_SearchInfoReport_s *x)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::SearchInfoReport_s",
+		   (SV*) (hv = newHV()));
+    setNumber(hv, "fullQuery", (IV) *x->fullQuery);
+    if (x->subqueryExpression)
+        setMember(hv, "subqueryExpression",
+		  translateQueryExpression(x->subqueryExpression));
+    if (x->subqueryCount)
+        setNumber(hv, "subqueryCount", (IV) *x->subqueryCount);
+    /* ### many, many elements omitted here */
+
+    return sv;
+}
+
+
+static SV *translateQueryExpression(Z_QueryExpression *x)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::QueryExpression", (SV*) (hv = newHV()));
+    setNumber(hv, "which", x->which);
+
+    switch (x->which) {
+    case Z_QueryExpression_term:
+	setMember(hv, "term", translateQueryExpressionTerm(x->u.term));
+	return sv;
+    case Z_QueryExpression_query:
+	break;
+    default:
+	break;
+    }
+
+    fatal("illegal/unsupported `which' (%d) in Z_QueryExpression", x->which);
+    return 0;			/* NOTREACHED; inhibit gcc -Wall warning */    
+}
+
+
+static SV *translateQueryExpressionTerm(Z_QueryExpressionTerm *x)
+{
+    SV *sv;
+    HV *hv;
+
+    sv = newObject("Net::Z3950::APDU::QueryExpressionTerm",
+		   (SV*) (hv = newHV()));
+    setMember(hv, "queryTerm", translateTerm(x->queryTerm));
+
+    return sv;
 }
 
 

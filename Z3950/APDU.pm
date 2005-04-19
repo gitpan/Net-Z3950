@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.12 2004/05/06 12:54:47 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/APDU.pm,v 1.13 2005/04/19 21:36:35 mike Exp $
 
 package Net::Z3950::APDU;
 use strict;
@@ -111,6 +111,7 @@ sub _fields { @FIELDS };
 	resultSetStatus()
 	presentStatus()
 	records()
+	additionalSearchInfo()
 
 =cut
 
@@ -119,7 +120,7 @@ use vars qw(@ISA @FIELDS);
 @ISA = qw(Net::Z3950::APDU);
 @FIELDS = qw(referenceId resultCount numberOfRecordsReturned
 	     nextResultSetPosition searchStatus resultSetStatus
-	     presentStatus records);
+	     presentStatus records additionalSearchInfo);
 sub _fields { @FIELDS };
 
 
@@ -660,6 +661,111 @@ use vars qw(@ISA @FIELDS);
 @ISA = qw(Net::Z3950::APDU);
 @FIELDS = qw(general numeric characterString oid
              dateTime external integerAndUnit null);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::OtherInformation
+
+No methods - just treat as a reference to an array of
+C<Net::Z3950::APDU::OtherInformationUnit>
+
+=cut
+
+package Net::Z3950::APDU::OtherInformation;
+
+=head2 Net::Z3950::APDU::OtherInformationUnit
+
+    which()
+    characterInfo()
+    binaryInfo()
+    externallyDefinedInfo
+    oid()
+
+At present only ``externallyDefinedInfo'' units are supported.
+
+=cut
+
+package Net::Z3950::APDU::OtherInformationUnit;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+
+@FIELDS = qw(which characterInfo binaryInfo externallyDefinedInfo oid);
+sub _fields { @FIELDS };
+
+# Define the OtherInformationUnit class's "which" enumeration, which
+# indicates which of the possible branches contains data (i.e. it's
+# the discriminator for a union.)
+package Net::Z3950::OtherInformationUnit;
+sub CharacterInfo { 1 }
+sub BinaryInfo  { 2 }
+sub ExternallyDefinedInfo { 3 }
+sub Oid { 4 }
+package Net::Z3950;
+
+
+=head2 Net::Z3950::APDU::SearchInfoReport
+
+No methods - just treat as a reference to an array of
+C<Net::Z3950::APDU::SearchInfoReport_s>
+
+=cut
+
+package Net::Z3950::APDU::SearchInfoReport;
+
+
+=head2 Net::Z3950::APDU::SearchInfoReport_s
+
+    fullQuery()
+    subqueryExpression()
+    subqueryCount()
+
+=cut
+
+package Net::Z3950::APDU::SearchInfoReport_s;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+
+@FIELDS = qw(fullQuery subqueryExpression subqueryCount);
+sub _fields { @FIELDS };
+
+
+=head2 Net::Z3950::APDU::QueryExpression
+
+    which()
+    term()
+    query()
+
+At present only ``term'' query expressions are supported.
+
+=cut
+
+package Net::Z3950::APDU::QueryExpression;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+
+@FIELDS = qw(which term query);
+sub _fields { @FIELDS };
+
+# Define the QueryExpression class's "which" enumeration, which
+# indicates which of the possible branches contains data (i.e. it's
+# the discriminator for a union.)
+package Net::Z3950::QueryExpression;
+sub Term { 1 }
+sub Query { 2 }
+package Net::Z3950;
+
+
+=head2 Net::Z3950::APDU::QueryExpressionTerm
+
+    queryTerm()
+
+=cut
+
+package Net::Z3950::APDU::QueryExpressionTerm;
+use vars qw(@ISA @FIELDS);
+@ISA = qw(Net::Z3950::APDU);
+
+@FIELDS = qw(queryTerm);
 sub _fields { @FIELDS };
 
 
