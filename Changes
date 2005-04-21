@@ -1,4 +1,4 @@
-$Id: Changes,v 1.68 2005/04/19 21:37:00 mike Exp $
+$Id: Changes,v 1.69 2005/04/21 10:06:21 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
 
@@ -10,6 +10,14 @@ TO DO
 	  and leaves things in a state whereby wait() can be
 	  successfully re-invoked to continue the concurrent
 	  operations of the remaining Connections.
+
+0.49  Thu Apr 21 11:06:02 BST 2005
+	- Change to the ResultSet::present() API in asynchronous mode:
+	  returns 1 if new requests were queued, 0 if all of the
+	  requested records had already been queued.  (No changes to
+	  its usage in synchronous mode.)
+	- yazwrap/send.c no longer includes <yaz/log.h> (not needed,
+	  generates warning)
 
 0.48  Tue Apr 19 22:36:45 2005
 	- Patches supplied by Jan Bauer Nielsen <jbn@dtv.dk> to

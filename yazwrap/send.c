@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.9 2004/11/01 08:31:44 adam Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.10 2005/04/21 09:55:05 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -11,7 +11,6 @@
 
 #include <unistd.h>
 #include <yaz/proto.h>
-#include <yaz/log.h>
 #include <yaz/pquery.h>		/* prefix query compiler */
 #include <yaz/ccl.h>		/* CCL query compiler */
 #include <yaz/yaz-ccl.h>	/* CCL-to-RPN query converter */

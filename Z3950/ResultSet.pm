@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.20 2005/04/19 21:36:35 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.21 2005/04/21 10:05:57 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -158,9 +158,10 @@ retrieval.
 
 Note that C<$start> is indexed from 1.
 
-Returns 1 if the records were successfully retrieved, 0 if an error
-occurred, and an undefined value if they were merely scheduled for
-retrieval because this is an asynchronous operation.
+In synchronous mode, returns 1 if the records were successfully
+retrieved, 0 if an error occurred.  In asynchronous mode, returns 1 if
+new requests were queued, 0 if all of the requested records had
+already been queued.
 
 =cut
 
@@ -190,11 +191,8 @@ sub present {
 	}
     }
     $this->{conn}->{idleWatcher}->start() if $seen_new;
-
-    if ($this->option('async')) {
-	$this->{errcode} = 0;
-	return undef;
-    }
+    return undef# $seen_new
+	if $this->option('async');
 
     # Synchronous-mode request for a record that we don't yet have.
     # As soon as we're idle -- in the wait() call -- the _idle()
@@ -242,8 +240,8 @@ sub record {
 	# Record not in place yet
 
 	my $status = $this->present($which, $this->option('prefetch') || 1);
-	if (!defined $status) {
-	    # Operation was asynchronous: request was merely queued
+	if ($this->option('async')) {
+	    # request was merely queued
 	    $this->{errcode} = 0;
 	    return undef;
 	} elsif (!$status) {

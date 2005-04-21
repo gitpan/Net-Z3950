@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.11 2005/04/19 21:36:35 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/test.pl,v 1.12 2005/04/21 10:05:31 mike Exp $
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -206,7 +206,7 @@ $rec->render() eq qq[6 fields:
 (4,1) "ESDD0048"
 (1,16) "199101"
 ]
-    or (print "not ok 16\n", $rec->render()), exit;
+    or (print "not ok 16\nrec='", $rec->render(), "'\n"), exit;
 print "ok 16\n";
 
 # Testing scan
