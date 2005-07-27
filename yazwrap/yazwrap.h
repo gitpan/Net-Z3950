@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.6 2004/11/01 08:31:44 adam Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/yazwrap.h,v 1.7 2005/07/27 12:06:40 mike Exp $ */
 
 /*
  * yazwrap/yazwrap.h -- wrapper functions for Yaz's client API.
@@ -82,6 +82,7 @@ databuf makeScanRequest(databuf referenceId,
 #define QUERYTYPE_PREFIX  39501	/* Yaz's "@attr"-ish forward-Polish notation */
 #define QUERYTYPE_CCL     39502	/* Send CCL string to server ``as is'' */
 #define QUERYTYPE_CCL2RPN 39503 /* Convert CCL to RPN (type-1) locally */
+#define QUERYTYPE_CQL     39504 /* Send CQL string to server ``as is'' */
 
 databuf makePresentRequest(databuf referenceId,
 			   char *resultSetId,

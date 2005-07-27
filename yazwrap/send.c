@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.10 2005/04/21 09:55:05 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.11 2005/07/27 12:07:00 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -164,6 +164,7 @@ databuf makeSearchRequest(databuf referenceId,
     struct ccl_rpn_node *rpn;
     int error, pos;
     static CCL_bibset bibset;
+    Z_External *ext;
 
     if (!prepare_odr(&odr, errmsgp))
 	return nodata((char*) 0);
@@ -233,6 +234,17 @@ databuf makeSearchRequest(databuf referenceId,
         attrset.value = VAL_BIB1; /* ### should be configurable! */
         zquery.u.type_1->attributeSetId = oid_ent_to_oid(&attrset, oidbuf);
         ccl_rpn_delete (rpn);
+        break;
+
+    case QUERYTYPE_CQL:
+        zquery.which = Z_Query_type_104;
+        ext = (Z_External*) odr_malloc(odr, sizeof(*ext));
+        ext->direct_reference = odr_getoidbystr(odr, "1.2.840.10003.16.2");
+        ext->indirect_reference = 0;
+        ext->descriptor = 0;
+        ext->which = Z_External_CQL;
+        ext->u.cql = odr_strdup(odr, query);
+        zquery.u.type_104 = ext;
         break;
 
     default:

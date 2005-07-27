@@ -1,4 +1,4 @@
-# $Id: Z3950.pm,v 1.43 2005/04/21 09:50:33 mike Exp $
+# $Id: Z3950.pm,v 1.45 2005/07/27 12:05:51 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.49';
+$VERSION = '0.50';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -209,6 +209,7 @@ package Net::Z3950::QueryType;
 sub Prefix  { 39501 }		# Yaz's "@attr"-ish forward-Polish notation
 sub CCL     { 39502 }		# Send CCL string to server ``as is''
 sub CCL2RPN { 39503 }		# Convert CCL to RPN (type-1) locally
+sub CQL     { 39504 }		# Send CQL string to server ``as is''
 package Net::Z3950;
 
 

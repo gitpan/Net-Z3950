@@ -1,15 +1,21 @@
-$Id: Changes,v 1.69 2005/04/21 10:06:21 mike Exp $
+$Id: Changes,v 1.75 2005/07/27 12:32:53 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
 
-TO DO
-	- ### Fix so that when one of the Connection objects
-	  associated with an asynchronous Manager can't connect,
-	  $mgr->wait() returns a reference to that Connection, and
-	  arranges for $conn->op() to return Net::Z3950::Op::Error,
-	  and leaves things in a state whereby wait() can be
-	  successfully re-invoked to continue the concurrent
-	  operations of the remaining Connections.
+0.50  Wed Jul 27 13:28:03 BST 2005
+	- Correct the ResultSet::present() fix that was supposed to be
+	  in the previous release: that code inadvertently always
+	  returned undef in asynchronous mode.
+	- "ywpriv.h" now #undefines "list", which the Perl development
+	  header files inexplicably and inexcusably #define to
+	  "Perl_list".
+	- "ywpriv.h" now #undefines "open", which Solaris 9 #defines
+	  (I really can't believe this) to "open64".  Maybe Sun would
+	  like me to go round their place and dump a load of _my_ crap
+	  in _their_ workspace?
+	- New querytype "cql" can be used to pass CQL queries,
+	  untranslated, straight through to the server.  Use like:
+		$conn->search(cql => "au=(kernighan and richie)")
 
 0.49  Thu Apr 21 11:06:02 BST 2005
 	- Change to the ResultSet::present() API in asynchronous mode:
@@ -463,6 +469,16 @@ TO DO
 --
 
 To be done:
+	- ### Fix so that when one of the Connection objects
+	  associated with an asynchronous Manager can't connect,
+	  $mgr->wait() returns a reference to that Connection, and
+	  arranges for $conn->op() to return Net::Z3950::Op::Error,
+	  and leaves things in a state whereby wait() can be
+	  successfully re-invoked to continue the concurrent
+	  operations of the remaining Connections.  This is
+	  potentially tricky to implement and test, and will only be
+	  used by a small proportion of applications, so I am not
+	  letting it delay release of other new functionality.
 	- ### Fix test.pl to work against either local or remote server.
 	- ### Make managers drop references to closed connections.
 	- ### Make $mgr->wait() finish when there are no connections left.

@@ -3,6 +3,7 @@ CVS
 Z3950/CVS
 doc/.cvsignore
 doc/CVS
+doc/Z3950
 samples/CVS
 samples/nz-client
 samples/tmp

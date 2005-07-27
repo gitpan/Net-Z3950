@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.21 2005/04/21 10:05:57 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/ResultSet.pm,v 1.22 2005/04/21 11:41:23 mike Exp $
 
 package Net::Z3950::ResultSet;
 use strict;
@@ -191,7 +191,7 @@ sub present {
 	}
     }
     $this->{conn}->{idleWatcher}->start() if $seen_new;
-    return undef# $seen_new
+    return undef
 	if $this->option('async');
 
     # Synchronous-mode request for a record that we don't yet have.

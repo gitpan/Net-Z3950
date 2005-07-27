@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.15 2004/11/01 09:12:52 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Tutorial.pm,v 1.16 2005/07/27 12:27:42 mike Exp $
 
 package Net::Z3950::Tutorial;
 use strict;
@@ -115,19 +115,22 @@ of the record that the server sent.
 
 =head2 Searching
 
-Searches may be specified in one of two different syntaxes, both of
-which will be familiar to users of the Yaz toolkit.  The default
+Searches may be specified in one of several different syntaxes.
+The default
 syntax is so-called Prefix Query Notation, or PQN, a bespoke format
 invented by Index Data to map simply to the Z39.50 type-1 query
-structure.  The other is the Common Command Language, or CCL, an
+structure.  A second is the Common Command Language (CCL) an
 international standard query language often used in libraries.
+The third is the Common Query Language (CQL) the query language
+used by SRW and SRU.
 
 CCL queries may be interpreted on the client side and translated into
 a type-1 query which is forwarded to the server; or it may be sent
-``as is'' for the server to interpret as it may.
+``as is'' for the server to interpret as it may.  CQL queries may only
+be passed ``as is''.
 
 The interpretation of the search string may be specified by passing an
-argument of C<-prefix>, C<-ccl> or C<-ccl2rpn> to the C<search()>
+argument of C<-prefix>, C<-ccl>, C<-ccl2rpn> or C<-cql> to the C<search()>
 method before the search string itself, as follows:
 
 B<Prefix Queries>
@@ -234,6 +237,12 @@ C<ccl2rpn>) the interpretation of the qualifiers in terms of type-1
 attributes is determined by the contents of a file called
 I<### not yet implemented>.
 The format of this file is described in the Yaz documentation.
+
+B<CQL Queries>
+
+	$rs = $conn->search(-cql => 'au-(kernighan and ritchie)');
+
+CQL syntax is very similar to that of CCL.
 
 B<Setting Search Defaults>
 

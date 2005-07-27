@@ -1,4 +1,4 @@
-# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.32 2005/01/04 22:09:51 mike Exp $
+# $Header: /home/cvsroot/NetZ3950/Z3950/Connection.pm,v 1.34 2005/07/27 12:25:44 mike Exp $
 
 package Net::Z3950::Connection;
 use IO::Handle;
@@ -482,9 +482,10 @@ A C<Net::Z3950::Query> object may be passed in.
 A query-type option may be passed in, together with the query string
 itself as its argument.  Currently recognised query types are C<-ccl>
 (using the standard CCL query syntax, interpreted by the server),
-C<-ccl2rpn> (CCL query compiled by the client into a type-1 query) and
+C<-ccl2rpn> (CCL query compiled by the client into a type-1 query),
 C<-prefix> (using Index Data's prefix query notation, described at
-http://indexdata.dk/yaz/doc/tools.php#PQF ).
+http://indexdata.dk/yaz/doc/tools.php#PQF )
+and C<-cql> (passing a CQL query straight through to the server).
 
 =item *
 
@@ -514,6 +515,7 @@ my %_queryTypes = (
     prefix => Net::Z3950::QueryType::Prefix,
     ccl => Net::Z3950::QueryType::CCL,
     ccl2rpn => Net::Z3950::QueryType::CCL2RPN,
+    cql => Net::Z3950::QueryType::CQL,
 );
 
 sub startSearch {
