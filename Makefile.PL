@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 1.11 2004/05/07 17:00:29 mike Exp $
+# $Id: Makefile.PL,v 1.12 2006/05/08 10:55:09 mike Exp $
 
 # If you want to build this module against a YAZ build that's not been
 # installed in one of the usual places, just give a full path to where
@@ -11,6 +11,15 @@ my $yazlibs = `$yazconf --libs`;
 if (!$yazinc || !$yazlibs) {
     die "ERROR: Unable to call script 'yaz-config': is YAZ installed?";
 }
+
+print <<__EOT__;
+
+	WARNING.  You should not be using this module unless you need
+	this precise API for compatibility reasons.  New applications
+	should use the ZOOM-Perl module (Net::Z3950::ZOOM) instead.
+		http://search.cpan.org/~mirk/Net-Z3950-ZOOM/
+
+__EOT__
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence

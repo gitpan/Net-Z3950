@@ -1,4 +1,27 @@
-$Header: /home/cvsroot/NetZ3950/README,v 1.12 2004/11/22 22:41:17 mike Exp $
+$Header: /home/cvsroot/NetZ3950/README,v 1.14 2006/05/08 10:54:56 mike Exp $
+
+Do Not Use This Module!
+-----------------------
+
+Unless you need the Net::Z3950 API for backwards compatibility
+(i.e. you're building it because it's a prerequisite for an existing
+application) you should instead use the newer and better ZOOM-Perl
+module:
+	http://search.cpan.org/~mirk/Net-Z3950-ZOOM/
+Its functionality is a strict superset of this module's, but it
+provides many additional features, including record-format
+translation, character-set handling and a properly documented
+asynchronous API.  Because it is based on ZOOM-C, the ZOOM-Perl model
+inherits functionality from that module, and will continue to benefit
+from its further development.  Finally, the ZOOM-C dependency allows
+the ZOOM-Perl code to be much shorter than Net::Z3950, and therefore
+easier to support: "The cheapest, fastest, most reliable components of
+a computer system are those that are not there" -- Gordon Bell.
+
+If despite all this, you really do want Net::Z3950 rather than
+ZOOM-Perl, then read on ...
+
+
 
 Net::Z3950.pm -- What Is It?
 ----------------------------
@@ -19,7 +42,7 @@ see the file COPYING for details.  (This is made explicit as of
 release 0.33, but it was always the intention.)
 
 Net::Z3950.pm is an implementation of the Perl binding for ZOOM, the
-Z39.50 Obejct Orientation Model.  Bindings for the same abstract API
+Z39.50 Object Orientation Model.  Bindings for the same abstract API
 are available in other languages including C, C++, Java, Tcl, Visual
 Basic, Python and Scheme.  There's more about ZOOM, including the
 specification, at

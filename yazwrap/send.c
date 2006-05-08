@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.11 2005/07/27 12:07:00 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/send.c,v 1.12 2006/05/08 10:54:14 mike Exp $ */
 
 /*
  * yazwrap/send.c -- wrapper functions for Yaz's client API.
@@ -326,7 +326,7 @@ databuf makeScanRequest(databuf referenceId,
             yaz_pqf_scan(pqf_parser, odr, &req->attributeSet, query)))
         {
             size_t off;
-            int code = yaz_pqf_error (pqf_parser,(const char **) errmsgp, &off);
+            (void) yaz_pqf_error (pqf_parser,(const char **) errmsgp, &off);
             yaz_pqf_destroy (pqf_parser);
             return nodata(*errmsgp);
         }
@@ -413,7 +413,7 @@ Z_ReferenceId *make_ref_id(Z_ReferenceId *buf, databuf refId)
     if (refId.data == 0)
 	return 0;
 
-    buf->buf = refId.data;
+    buf->buf = (unsigned char*) refId.data;
     buf->len = (int) refId.len;
     return buf;
 }
@@ -448,6 +448,7 @@ static databuf encode_apdu(ODR odr, Z_APDU *apdu, char **errmsgp)
 {
     databuf res;
     int len;
+    res.len = 0;		/* Not needed, but prevents compiler warning */
     res.data = 0;
 
     if (!z_APDU(odr, &apdu, 0, (char*) 0)) {
@@ -487,6 +488,7 @@ static databuf nodata(char *msg)
 	fprintf(stderr, "DEBUG nodata(): %s\n", msg);
     }
 #endif
+    buf.len = 0;		/* Not needed, but prevents compiler warning */
     buf.data = 0;
     return buf;
 }

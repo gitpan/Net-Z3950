@@ -1,6 +1,11 @@
-$Id: Changes,v 1.75 2005/07/27 12:32:53 mike Exp $
+$Id: Changes,v 1.77 2006/05/08 10:55:26 mike Exp $
 
 Revision history for Perl extension Net::Z3950.
+
+0.51  Mon May  8 11:55:19 BST 2006
+	- Deprecation in favour of ZOOM-Perl.
+	- Fix some compiler warnings.
+	- Fix typo in documentation (thanks to Kimmo Valtonen).
 
 0.50  Wed Jul 27 13:28:03 BST 2005
 	- Correct the ResultSet::present() fix that was supposed to be

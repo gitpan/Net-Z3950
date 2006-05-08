@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.19 2005/04/19 21:36:35 mike Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/yazwrap/receive.c,v 1.20 2006/05/08 10:54:22 mike Exp $ */
 
 /*
  * yazwrap/receive.c -- wrapper functions for Yaz's client API.
@@ -297,11 +297,11 @@ static SV *translateDeleteRSResponse(Z_DeleteResultSetResponse *res,
     setNumber(hv, "deleteOperationStatus", (IV) *res->deleteOperationStatus);
 
     /* ### We needn't bother with _any_ of this, really */
-    /* Z_ListStatuses *deleteListStatuses; /* OPT */
-    /* int *numberNotDeleted; /* OPT */
-    /* Z_ListStatuses *bulkStatuses; /* OPT */
-    /* Z_InternationalString *deleteMessage; /* OPT */
-    /* Z_OtherInformation *otherInfo; /* OPT */
+    /* Z_ListStatuses *deleteListStatuses; (OPT) */
+    /* int *numberNotDeleted; (OPT) */
+    /* Z_ListStatuses *bulkStatuses; (OPT) */
+    /* Z_InternationalString *deleteMessage; (OPT) */
+    /* Z_OtherInformation *otherInfo; (OPT) */
 
     return sv;
 }
@@ -520,7 +520,7 @@ static SV *translateTerm(Z_Term *x) {
 
     switch (x->which) {
     case Z_Term_general:
-	setBuffer(hv, "general", x->u.general->buf, x->u.general->len);
+	setBuffer(hv, "general", (char*) x->u.general->buf, x->u.general->len);
 	break;
     case Z_Term_numeric:
 	/* ### this won't do at all */
@@ -879,7 +879,7 @@ static SV *translateOctetAligned(Odr_oct *x, Odr_oid *direct_reference)
     if (rs[i].val == VAL_NOP)
 	fatal("can't translate record of unknown RS");
 
-    return newObject(rs[i].name, newSVpvn(x->buf, x->len));
+    return newObject(rs[i].name, newSVpvn((char*) x->buf, x->len));
 }
 
 

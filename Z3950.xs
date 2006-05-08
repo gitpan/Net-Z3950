@@ -1,4 +1,4 @@
-/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.6 2004/11/01 08:31:43 adam Exp $ */
+/* $Header: /home/cvsroot/NetZ3950/Z3950.xs,v 1.7 2006/05/08 10:54:41 mike Exp $ */
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -37,12 +37,14 @@ static char *SVstar2MNPV(SV* svp)
  * to surgically remove this code, so we leave it in for now -- the
  * overhead can't be great.
  */
+#if 0
 static int
 not_here(char *s)
 {
     croak("%s not implemented on this architecture", s);
     return -1;
 }
+#endif
 
 static double
 constant(char *name, int arg)
@@ -103,10 +105,6 @@ constant(char *name, int arg)
 	break;
     }
     errno = EINVAL;
-    return 0;
-
-not_there:
-    errno = ENOENT;
     return 0;
 }
 

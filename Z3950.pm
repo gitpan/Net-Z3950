@@ -1,4 +1,4 @@
-# $Id: Z3950.pm,v 1.45 2005/07/27 12:05:51 mike Exp $
+# $Id: Z3950.pm,v 1.47 2006/05/08 10:50:21 mike Exp $
 
 package Net::Z3950;
 
@@ -11,7 +11,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '0.50';
+$VERSION = '0.51';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -42,6 +42,14 @@ bootstrap Net::Z3950 $VERSION;
 =head1 NAME
 
 Net::Z3950 - Perl extension for talking to Z39.50 servers.
+
+=head1 WARNING
+
+You should not be using this module unless you need
+this precise API for compatibility reasons.  New applications
+should use the ZOOM-Perl module (Net::Z3950::ZOOM) instead.
+
+http://search.cpan.org/~mirk/Net-Z3950-ZOOM/
 
 =head1 SYNOPSIS
 
@@ -276,7 +284,7 @@ functionality is provided by the daughter modules included by C<Net::Z3950>
 =head2 errstr()
 
 	$errcode = $conn->errcode();
-	$errmsg = Net::Z3950::errmsg($errcode);
+	$errmsg = Net::Z3950::errstr($errcode);
 	print "error $errcode ($errmsg)\n";
 
 Returns an English-language string describing the error indicated by
